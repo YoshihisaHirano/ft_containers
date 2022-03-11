@@ -3,22 +3,24 @@
 #include <iterator>
 
 namespace ft {
-	template <typename Iter>
-	struct iterator_traits {
-		typedef typename Iter::value_type value_type;
-		typedef typename Iter::difference_type difference_type;
-		typedef typename Iter::pointer pointer;
-		typedef typename Iter::reference reference;
-		typedef typename Iter::iterator_category iterator_category;
+	template <class Iter>
+	class iterator_traits {
+		public:
+		typedef class Iter::value_type value_type;
+		typedef class Iter::difference_type difference_type;
+		typedef class Iter::pointer pointer;
+		typedef class Iter::reference reference;
+		typedef class Iter::iterator_category iterator_category;
 	};
 
-	template <typename T>
-	struct iterator_traits<T*> {
-		typedef typename T	value_type;
+	template <class T>
+	class iterator_traits<T*> {
+		public:
+		typedef T	value_type;
 		typedef ptrdiff_t	difference_type;
-		typedef typename T*	pointer;
-		typedef typename T&	reference;
-		typedef typename std::random_access_iterator_tag iterator_category;
+		typedef T*	pointer;
+		typedef T&	reference;
+		typedef std::random_access_iterator_tag iterator_category;
 	};
 }
 
