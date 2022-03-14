@@ -6,18 +6,28 @@
 int main()
 {
 	std::cout << "hi" << std::endl;
-	std::vector<int> vect;
+	// ft::vector<int> vect(static_cast<size_t>(9), 2);
+	ft::vector<int> vect(9, 23);
+	ft::vector<int>	vect1(vect);
+	vect.push_back(78);
+	vect.push_back(12);
+	vect.push_back(78);
+	vect.push_back(12);
+	vect.push_back(78);
+	vect.push_back(12);
+	std::cout << "size: " << vect.size() << " capacity "  << vect.capacity() << " back: " << vect.back() << std::endl;
+	std::cout << "size: " << vect1.size() << " capacity " << vect1.capacity() << " back: " << vect1.back() << std::endl;
 	// std::vector<int>::iterator it = vect.begin();
 	// std::vector<int>::iterator ite = vect.end();
 
-	std::vector<int> second(6);
-	std::cout << second.size() << " size " << second.capacity() << " capacity" << std::endl;
-	try {
-		second.assign(0, 8);
-		std::cout << second.size() << " size " << second.capacity() << " capacity" << std::endl;
-	} catch (const std::exception& e) {
-		std::cout << e.what() << std::endl;
-	}
+	// std::vector<int> second(6);
+	// std::cout << second.size() << " size " << second.capacity() << " capacity" << std::endl;
+	// try {
+	// 	second.assign(0, 8);
+	// 	std::cout << second.size() << " size " << second.capacity() << " capacity" << std::endl;
+	// } catch (const std::exception& e) {
+	// 	std::cout << e.what() << std::endl;
+	// }
 
 
 	// std::vector<int> first;	
