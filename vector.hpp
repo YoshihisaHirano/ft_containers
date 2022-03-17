@@ -3,17 +3,23 @@
 #include <memory>
 #include "iterator.hpp"
 #include <exception>
+#include <iterator>
+#include <iostream>
 
 namespace ft {
 	template <typename T>
-	class vectorIterator : public iterator_traits<T*>
+	class vectorIterator
 	{
 		private:
 		T* ptr;
 
 		public:
+		typedef typename iterator_traits<T*>::pointer	pointer;
+		typedef typename iterator_traits<T*>::reference	reference;
+		typedef typename iterator_traits<T*>::difference_type difference_type;
+
 		vectorIterator() : ptr(nullptr) {};
-		vectorIterator(typename iterator_traits<T*>::pointer pointer) : ptr(pointer) {};
+		vectorIterator(pointer pointer) : ptr(pointer) {};
 		vectorIterator(const vectorIterator& other) : ptr(other.ptr) {};
 		~vectorIterator() { this->ptr = nullptr; };
 
@@ -22,64 +28,69 @@ namespace ft {
 			return *this; 
 		};
 
-		typename iterator_traits<T*>::reference operator*() { return *(this->ptr);}
-		const typename iterator_traits<T*>::reference operator*() const { return *(this->ptr); }
+		reference operator*() { return *(this->ptr);}
+		const reference operator*() const { return *(this->ptr); }
 
-		typename iterator_traits<T*>::pointer operator->() { return this->ptr; }
-		const typename iterator_traits<T*>::pointer operator->() const { return this->ptr; }
+		pointer operator->() { return this->ptr; }
+		const pointer operator->() const { return this->ptr; }
 
-		typename iterator_traits<T*>::reference operator[](int index) { return *(this->ptr + index); }
-		const typename iterator_traits<T*>::reference operator[](int index) const { return *(this->ptr + index); }
+		reference operator[](int index) { return *(this->ptr + index); }
+		const reference operator[](int index) const { return *(this->ptr + index); }
 
-		vectorIterator<T> operator++(int) { 
-			vectorIterator<T> temp(*this);
+		vectorIterator operator++(int) { 
+			vectorIterator temp(*this);
 			++(this->ptr);
 			return temp;
 		}
-		vectorIterator<T> &operator++() { 
+		vectorIterator &operator++() { 
 			++(this->ptr);
 			return (*this);
 		}
-		vectorIterator<T> operator--(int) { 
-			vectorIterator<T> temp(*this);
+		vectorIterator operator--(int) { 
+			vectorIterator temp(*this);
 			--(this->ptr);
 			return temp;
 		}
-		vectorIterator<T> &operator--() { 
+		vectorIterator &operator--() { 
 			--(this->ptr);
 			return (*this);
 		}
 
-		vectorIterator<T> &operator+=(int val) {
+		vectorIterator &operator+=(int val) {
 			this->ptr += val;
 			return (*this);
 		}
 
-		vectorIterator<T> &operator-=(int val) {
+		vectorIterator &operator-=(int val) {
 			this->ptr -= val;
 			return (*this);
 		}
 
-		vectorIterator<T> &operator+(int val) {
-			return vectorIterator<T>(this->ptr += val);
+		vectorIterator operator+(int val) {
+			vectorIterator  tmp(*this);
+			return (tmp += val);
 		}
 
-		vectorIterator<T> &operator-(int val) {
-			return vectorIterator<T>(this->ptr -= val);
+		vectorIterator operator-(int val) {
+			vectorIterator  tmp(*this);
+			return (tmp -= val);
 		}
 
-		typename iterator_traits<T*>::difference_type operator-(const vectorIterator<T>& other) {
+		difference_type operator-(const vectorIterator& other) {
 			return (this->ptr - other.ptr);
 		}
 
-		bool operator==(const vectorIterator<T>& other) const { return this->ptr == other.ptr; }
-		bool operator!=(const vectorIterator<T>& other) const { return this->ptr != other.ptr; }
-		bool operator>=(const vectorIterator<T>& other) const { return this->ptr >= other.ptr; }
-		bool operator<=(const vectorIterator<T>& other) const { return this->ptr <= other.ptr; }
-		bool operator>(const vectorIterator<T>& other) const { return this->ptr > other.ptr; }
-		bool operator<(const vectorIterator<T>& other) const { return this->ptr < other.ptr; }
+		bool operator==(const vectorIterator& other) const { return this->ptr == other.ptr; }
+		bool operator!=(const vectorIterator& other) const { return this->ptr != other.ptr; }
+		bool operator>=(const vectorIterator& other) const { return this->ptr >= other.ptr; }
+		bool operator<=(const vectorIterator& other) const { return this->ptr <= other.ptr; }
+		bool operator>(const vectorIterator& other) const { return this->ptr > other.ptr; }
+		bool operator<(const vectorIterator& other) const { return this->ptr < other.ptr; }
 
+		pointer	getPointer() const { return this->ptr; }
 	};
+
+
 
 	template< typename T, typename Allocator = std::allocator<T> >
 	class vector
@@ -103,14 +114,12 @@ namespace ft {
 
 		void		_removeData(iterator begin, iterator end) {
 			for (iterator it = begin; it != end; ++it) 
-				this->_alloc.destroy(&(*it));
+				this->_alloc.destroy(it.getPointer());
 		};
 
 		void		_fillData(iterator begin, iterator end, value_type val) {
-			for (iterator it = begin; it != end; ++it) {
-				this->_alloc.destroy(&(*it));
-				this->_alloc.construct(&(*it), val);
-			}
+			for (iterator it = begin; it != end; ++it)
+				this->_alloc.construct(it.getPointer(), val);
 		};
 
 		size_type	_newCapacity(size_type currSize) { return (static_cast<int>(currSize * 1.5)); };
@@ -122,6 +131,16 @@ namespace ft {
 			this->_alloc.deallocate(this->_data, this->_capacity);
 			this->_data = tempAllloc;
 			this->_capacity = newCapacity;
+		};
+
+		void		_checkRangeOverflow(size_type n) { 
+			if (n >= this->_size)
+				throw std::out_of_range("Error: Out of range!");
+		};
+
+		void		_throwIfEmpty() { 
+			if (this->empty())
+				throw std::underflow_error("Error: Trying to access objects inside an empty vector!");
 		};
 
 	public:
@@ -142,8 +161,7 @@ namespace ft {
 		// };
 
 		vector(size_type vectorSize, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
-		: _size(vectorSize), _alloc(alloc) { 
-			this->_capacity = this->_newCapacity(vectorSize);
+		: _size(vectorSize), _capacity(vectorSize), _alloc(alloc) { 
 			this->_data = this->_alloc.allocate(this->_capacity);
 			for (size_type i = 0; i < vectorSize; i++)
 				this->_alloc.construct(this->_data + i, val);
@@ -156,7 +174,26 @@ namespace ft {
 		};
 
 		~vector() {
+			// std::cout << "destructor called" << std::endl;
 			this->clear();
+		};
+
+		vector			&operator=(const vector& other) {
+			this->clear();
+			this->_size = other.size();
+			this->_capacity = other.capacity();
+			this->_alloc = other.get_allocator();
+			this->assign(other.cbegin(), other.cend());
+		};
+
+		reference operator[](size_type n) {
+			this->_checkRangeOverflow(n);
+			return *(this->_data + n);
+		};
+
+		const_reference operator[](size_type n) const { 
+			this->_checkRangeOverflow(n);
+			return (const_cast<const_reference>(*(this->_data + n)));
 		};
 
 		const iterator 	cbegin() const { return iterator(this->_data); };
@@ -173,78 +210,61 @@ namespace ft {
 		};
 
 		bool			empty() const { return (this->_size == 0); };
-		size_type		capacity() const { return (this->_capacity); };
-		size_type		size() const { return (this->_size); };
-		pointer			data() { return (this->_data); };
-		const_pointer	data() const { return (this->_data); };
-		allocator_type	get_allocator() { return allocator_type(); };
+		size_type		capacity() const { return this->_capacity; };
+		size_type		size() const { return this->_size; };
+		pointer			data() { return this->_data; };
+		const_pointer	data() const { return this->_data; };
+		allocator_type	get_allocator() const { return allocator_type(); };
+		size_type		max_size() const {return this->_alloc.max_size(); };
 
 		void			resize (size_type n, value_type val = value_type()) {
-			pointer	tmp;
-			size_t	i;
-			size_t	new_capacity;
-
 			if (n == this->_size)
 				return;
 			else if (n < this->_size) {
-				for (iterator it = (this->begin() + n); it != this->end(); ++it)
-					this->_alloc.destroy(&(*it));
-					//TODO check if capacity changes!
+				this->_removeData(this->begin() + n, this->end());
+				this->_size -= (this->_size - n);
 			} else {
-				new_capacity = this->_newCapacity(n); 
-				if (n > this->_capacity) // some shit is happening here
-					tmp = this->_alloc.allocate(new_capacity);
-				for (i = 0 ; i < this->_size; i++)
-					this->_alloc.construct((tmp + i), *(this->_data + i));
-				this->clear();
-				this->_capacity = new_capacity;
-				this->_data = tmp;
-				for (i = n - this->_size; i < n ; i++)
-					this->_alloc.construct((this->_data + i), val);
+				iterator temp = this->end();
+				size_type diff = n - this->_size;
+				this->_reAlloc(this->_newCapacity(n));
+				this->_size = n;
+				this->_fillData(temp, temp + diff, val);
 			}
-			this->_size = n;
 		};
 
 		reference		at (size_type n) { 
-			if (n >= this->_size)
-				throw std::out_of_range("Error: Out of range!");
+			this->_checkRangeOverflow(n);
 			return *(this->_data + n);
 		};
 
 		const_reference	at (size_type n) const { 
-			if (n >= this->_size)
-				throw std::out_of_range("Error: Out of range!");
+			this->_checkRangeOverflow(n);
 			return *(this->_data + n);
 		};
 
 		reference		back () { 
-			if (this->_size == 0)
-				throw std::out_of_range("Error: Out of range!");
+			this->_throwIfEmpty();
 			return *(this->_data + this->_size - 1);
 		};
 
 		const_reference	back () const { 
-			if (this->_size == 0)
-				throw std::out_of_range("Error: Out of range!");
+			this->_throwIfEmpty();
 			return *(this->_data + this->_size - 1);
 		};
 
 		reference		front () { 
-			if (this->_size == 0)
-				throw std::out_of_range("Error: Out of range!");
+			this->_throwIfEmpty();
 			return *(this->_data);
 		};
 
 		const_reference	front () const { 
-			if (this->_size == 0)
-				throw std::out_of_range("Error: Out of range!");
+			this->_throwIfEmpty();
 			return *(this->_data);
 		};
 
 		void			push_back (const value_type& val) {
 			if (this->_size < this->_capacity) 
 				this->_data[this->_size] = val;
-
 			else {
 				this->_reAlloc(this->_newCapacity(this->_size + 1));
 				this->_data[this->_size] = val;
@@ -253,28 +273,25 @@ namespace ft {
 		};
 
 		void			pop_back() {
-			if (!this->empty()) {
-				this->_alloc.destroy(this->_data + this->_size - 1);
-				this->_size--;
-				return;
-			}
-			throw std::underflow_error("Error! The vector is empty!");
+			this->_throwIfEmpty();
+			this->_removeData(this->end() - 1, this->end());
+			this->_size--;
 		};
 
 		void			reserve (size_type n) {
-			// TODO: check that n is not bigger than max_size
-			if (n > this->_capacity)
+			if (n <= this->max_size() &&  n > this->_capacity)
 				this->_reAlloc(n);
 		};
 
 		iterator		erase (iterator first, iterator last) {
-			this->_size -= std::distance(first, last);
 			if (last == this->end()) {
-				this->_removeData(firts, last);
+				this->_removeData(first, last);
+				this->_size -= std::distance(first, last);
 				return this->end();
 			} else {
-				this->_removeData(firts, last);
+				this->_removeData(first, last);
 				std::copy(last, this->end(), first);
+				this->_size -= std::distance(first, last);
 				return first;
 			}
 		};
@@ -283,16 +300,66 @@ namespace ft {
 			return this->erase(position, position + 1);
 		};
 
-		template <typename InputIterator>
-		void			assign (InputIterator first, InputIterator last) {
-			if (last - first <= 0)
-				throw std::out_of_range("Error: Wrong iterators range!");
+		// template <typename InputIterator> // TODO implement enable_if so that sfinae works properly
+		// void			assign (InputIterator first, InputIterator last) {
+		// 	difference_type sdst = std::distance(first, last);
+		// 	if (sdst <= 0)
+		// 		throw std::out_of_range("Error: Wrong iterators range!");
+		// 	size_type dst = static_cast<size_type>(sdst);
+		// 	if (dst >= this->_capacity) {
+		// 		this->clear();
+		// 		this->_capacity = dst;
+		// 		this->_data = this->_alloc.allocate(dst);
+		// 	} else
+		// 		this->_removeData(this->begin(), this->end());
+		// 	this->_size = dst;
+		// 	std::copy(first, last, this->begin());
+		// };
+
+		void			assign (size_type n, const value_type& val) {
+			if (n > this->_capacity) {
+				this->clear();
+				this->_capacity = n;
+				this->_data = this->_alloc.allocate(n);
+			} else
+				this->_removeData(this->begin(), this->end());
+			this->_size = n;
+			this->_fillData(this->begin(), this->end(), val);
 		};
 
-		// void			assign (size_type n, const value_type& val) {
+		void			insert(iterator position, size_type n, const value_type& val) {
+			if (n + this->_size >= this->_capacity) {
+				size_type newSize = this->_size + n;
+				size_type newCapacity = this->_newCapacity(newSize);
+				pointer temp = this->_alloc.allocate(newCapacity);
+				iterator tempIter = iterator(temp);
+				std::copy(this->begin(), position, tempIter);
+				tempIter += (position - this->begin());
+				this->_fillData(tempIter, tempIter + n, val);
+				std::copy(position, this->end(), tempIter + n);
+				this->clear();
+				this->_size = newSize;
+				this->_capacity = newCapacity;
+				this->_data = temp;
+			} else {
+				iterator oldEnd = this->end();
+				this->_size += n;
+				std::copy_backward(position, oldEnd, this->end());
+				this->_fillData(position, position + n, val);
+			}
+		};
+
+		iterator		insert(iterator position, const value_type& val) {
+			difference_type distanceFromBegin = position - this->begin();
+			this->insert(position, 1, val);
+			return (this->begin() + distanceFromBegin);
+		};
+
+		// template <class InputIterator>
+		// void			insert(iterator position, InputIterator first, InputIterator last) {
 
 		// };
-	};
+	}; 
 	
 }
 

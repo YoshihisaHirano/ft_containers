@@ -6,8 +6,9 @@ NAME	=	ft_containers
 
 all		:	$(NAME)
 
+#-g -fsanitize=address
 $(NAME)	:	$(SRC) $(HDRS)
-			c++ -Wall -Wextra -Werror -std=c++98 $(SRC) -o $(NAME)
+			c++ -Wall -Wextra -Werror -std=c++98 -g $(SRC) -o $(NAME)
 
 fclean	:	
 			rm -f $(NAME)
