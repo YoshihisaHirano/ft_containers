@@ -2,6 +2,14 @@
 #include "iterator.hpp"
 #include <iostream>
 #include <vector>
+#include <type_traits>
+#include "is_integral.hpp"
+#include "pair.hpp"
+#include "equal.hpp"
+
+bool mypredicate (int i, int j) {
+	return (i==j);
+}
 
 int main()
 {
@@ -74,7 +82,6 @@ int main()
 	it = myvector.begin();
 	std::cout << "myvector size: " << myvector.size() << " capacity "  << myvector.capacity() << std::endl;
 	it = myvector.insert ( it, 200 );
-	// myvector.reserve(91);
 	std::cout << "after insertion - size: " << myvector.size() << " capacity "  << myvector.capacity() << 
 	" back: " << myvector.back() << " front: " << myvector.front()  << std::endl;
 	for (size_t i = 0; i < myvector.size(); i++) {
@@ -158,6 +165,80 @@ int main()
 	// std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
 	// avect.assign(thirdVect.begin(), thirdVect.end());
 	// std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
+	}
+
+	{
+		std::cout << std::boolalpha;
+		std::cout << "_____is_integral______" << std::endl;
+		std::cout << "std char: " << std::is_integral<char>::value << std::endl;
+		std::cout << "ft char: " << ft::is_integral<char>::value << std::endl;
+		std::cout << "std int: " << std::is_integral<int>::value << std::endl;
+		std::cout << "ft int: " << ft::is_integral<int>::value << std::endl;
+		std::cout << "std float: " << std::is_integral<float>::value << std::endl;
+		std::cout << "ft float: " << ft::is_integral<float>::value << std::endl;
+		std::cout << "std std::vector<int>: " << std::is_integral<std::vector<int> >::value << std::endl;
+		std::cout << "ft std::vector<int>: " << ft::is_integral<std::vector<int> >::value << std::endl;
+	}
+
+	{
+		std::cout << "______pair_______" << std::endl;
+		std::pair <int,int> foo;
+		std::cout << "std first: " << foo.first << " second: " << foo.second << std::endl;
+		ft::pair <int,int> ffoo;
+		std::cout << "ft first: " << ffoo.first << " second: " << ffoo.second << std::endl;
+
+		ft::pair <std::string,double> product1;                     // default constructor
+  		ft::pair <std::string,double> product2 ("tomatoes",2.30);   // value init
+  		ft::pair <std::string,double> product3 (product2);          // copy constructor
+
+  		product1 = ft::make_pair(std::string("lightbulbs"),0.99);   // using make_pair
+
+  		product2.first = "shoes";                  // the type of first is string
+  		product2.second = 39.90;                   // the type of second is double
+
+		std::cout << "The price of " << product1.first << " is $" << product1.second << '\n';
+		std::cout << "The price of " << product2.first << " is $" << product2.second << '\n';
+		std::cout << "The price of " << product3.first << " is $" << product3.second << '\n';
+	}
+
+	{
+		std::cout << "______equal_______" << std::endl;
+		// int myints[] = {20,40,60,80,100};               //   myints: 20 40 60 80 100
+  		// ft::vector<int>myvector (myints,myints+5);     // myvector: 20 40 60 80 100
+		ft::vector<int> myvector(5, 10);
+		ft::vector<int> myints(5, 10);
+
+  		// using default comparison:
+		if ( ft::equal (myvector.begin(), myvector.end(), myints.begin()) )
+		std::cout << "The contents of both sequences are equal.\n";
+		else
+		std::cout << "The contents of both sequences differ.\n";
+
+  		myvector[3]=81;                                 // myvector: 20 40 60 81 100
+
+  		// using predicate comparison:
+		if ( ft::equal (myvector.begin(), myvector.end(), myints.begin(), mypredicate) )
+		std::cout << "The contents of both sequences are equal.\n";
+		else
+		std::cout << "The contents of both sequences differ.\n";
+	}
+
+	{
+		std::cout << "______vector.swap_______" << std::endl;
+		ft::vector<int> foo (3,100);   // three ints with a value of 100
+  		ft::vector<int> bar (5,200);   // five ints with a value of 200
+
+		foo.swap(bar);
+
+		std::cout << "foo contains:";
+		for (unsigned i=0; i<foo.size(); i++)
+			std::cout << " " << foo[i];
+		std::cout << std::endl;
+
+		std::cout << "bar contains:";
+		for (unsigned i=0; i<bar.size(); i++)
+			std::cout << " " << bar[i];
+		std::cout << std::endl;
 	}
 	return 0;
 }

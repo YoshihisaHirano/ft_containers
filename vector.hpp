@@ -8,15 +8,15 @@
 
 namespace ft {
 	template <typename T>
-	class vectorIterator
+	class vectorIterator : public iterator_traits<T*>
 	{
 		private:
 		T* ptr;
 
 		public:
-		typedef typename iterator_traits<T*>::pointer	pointer;
-		typedef typename iterator_traits<T*>::reference	reference;
-		typedef typename iterator_traits<T*>::difference_type difference_type;
+		typedef typename iterator_traits<T*>::pointer			pointer;
+		typedef typename iterator_traits<T*>::reference			reference;
+		typedef typename iterator_traits<T*>::difference_type	difference_type;
 
 		vectorIterator() : ptr(nullptr) {};
 		vectorIterator(pointer pointer) : ptr(pointer) {};
@@ -124,13 +124,19 @@ namespace ft {
 
 		size_type	_newCapacity(size_type currSize) { return (static_cast<int>(currSize * 1.5)); };
 
+		void		_reassignVector(pointer newData, size_type newCapacity, size_type newSize)
+		{
+			this->_data = newData;
+			this->_capacity = newCapacity;
+			this->_size = newSize;
+		}
+
 		void		_reAlloc(size_type newCapacity) { 
 			pointer tempAllloc = this->_alloc.allocate(newCapacity);
 			std::copy(this->begin(), this->end(), iterator(tempAllloc));
 			this->_removeData(this->begin(), this->end());
 			this->_alloc.deallocate(this->_data, this->_capacity);
-			this->_data = tempAllloc;
-			this->_capacity = newCapacity;
+			this->_reassignVector(tempAllloc, newCapacity, this->_size);
 		};
 
 		void		_checkRangeOverflow(size_type n) { 
@@ -204,9 +210,7 @@ namespace ft {
 		void			clear() {
 			this->_removeData(this->begin(), this->end());
 			this->_alloc.deallocate(this->_data, this->_capacity);
-			this->_data = nullptr;
-			this->_size = 0;
-			this->_capacity = 0;
+			this->_reassignVector(nullptr, 0, 0);
 		};
 
 		bool			empty() const { return (this->_size == 0); };
@@ -303,8 +307,8 @@ namespace ft {
 		// template <typename InputIterator> // TODO implement enable_if so that sfinae works properly
 		// void			assign (InputIterator first, InputIterator last) {
 		// 	difference_type sdst = std::distance(first, last);
-		// 	if (sdst <= 0)
-		// 		throw std::out_of_range("Error: Wrong iterators range!");
+		// 	if (sdst < 0)
+		// 		throw std::range_error("Error: Wrong iterators range!");
 		// 	size_type dst = static_cast<size_type>(sdst);
 		// 	if (dst >= this->_capacity) {
 		// 		this->clear();
@@ -328,19 +332,17 @@ namespace ft {
 		};
 
 		void			insert(iterator position, size_type n, const value_type& val) {
-			if (n + this->_size >= this->_capacity) {
+			if (n + this->_size > this->_capacity) {
 				size_type newSize = this->_size + n;
 				size_type newCapacity = this->_newCapacity(newSize);
 				pointer temp = this->_alloc.allocate(newCapacity);
 				iterator tempIter = iterator(temp);
 				std::copy(this->begin(), position, tempIter);
-				tempIter += (position - this->begin());
+				tempIter += std::distance(this->begin(), position);
 				this->_fillData(tempIter, tempIter + n, val);
 				std::copy(position, this->end(), tempIter + n);
 				this->clear();
-				this->_size = newSize;
-				this->_capacity = newCapacity;
-				this->_data = temp;
+				this->_reassignVector(temp, newCapacity, newSize);
 			} else {
 				iterator oldEnd = this->end();
 				this->_size += n;
@@ -350,17 +352,83 @@ namespace ft {
 		};
 
 		iterator		insert(iterator position, const value_type& val) {
-			difference_type distanceFromBegin = position - this->begin();
+			difference_type distanceFromBegin = std::distance(this->begin(), position);
 			this->insert(position, 1, val);
 			return (this->begin() + distanceFromBegin);
 		};
 
-		// template <class InputIterator>
+		// template <class InputIterator> // TODO implement enable_if so that sfinae works properly
 		// void			insert(iterator position, InputIterator first, InputIterator last) {
-
+		// 	difference_type sdst = std::distance(first, last);
+		// 	if (sdst < 0)
+		// 		throw std::range_error("Error: Wrong iterators range!");
+		// 	size_type dst = static_cast<size_type>(sdst);
+		// 	if (this->_size + dst > this->_capacity) {
+		// 		size_type newSize = this->_size + dst;
+		// 		size_type newCapacity = this->_newCapacity(newSize);
+		// 		pointer temp = this->_alloc.allocate(newCapacity);
+		// 		iterator tempIter = iterator(temp);
+		// 		std::copy(this->begin(), position, tempIter);
+		// 		tempIter += std::distance(this->begin(), position);
+		// 		std::copy(first, last, tempIter);
+		// 		std::copy(position, this->end(), tempIter + dst);
+		// 		this->clear();
+		// 		this->_reassignVector(temp, newCapacity, newSize);
+		// 	} else {
+		// 		iterator oldEnd = this->end();
+		// 		this->_size += dst;
+		// 		std::copy_backward(position, oldEnd, this->end());
+		// 		std::copy(first, last, position);
+		// 	}
 		// };
-	}; 
+
+		void			swap(vector& other) {
+			// if (other == *this)
+			// 	return;
+
+			pointer tempData = this->_data;
+			size_type tempSize = this->_size;
+			size_type tempCapacity = this->_capacity;
+			allocator_type tempAlloc = this->_alloc;
+
+			this->_size = other._size;
+			this->_capacity = other._capacity;
+			this->_data = other._data;
+			this->_alloc = other._alloc;
+			other._size = tempSize;
+			other._capacity = tempCapacity;
+			other._data = tempData;
+			other._alloc = tempAlloc;
+		};
+	};
+
+	template <class T, class Alloc>
+	bool operator==(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+		if (lhs.size() != rhs.size()) { return false; }
+		vector<T,Alloc>::iterator it1 = lhs.begin();
+		vector<T,Alloc>::iterator it2 = rhs.begin();
+		for (; it1 != lhs.end(); ++it1, ++it2) {
+			if (*it1 != *it2) { return false; }
+		}
+		return true;
+	};
 	
+	template <class T, class Alloc>
+	bool operator!=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+		return !(lhs == rhs);
+	};
+	
+	template <class T, class Alloc>
+	bool operator<(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs);
+
+	template <class T, class Alloc>
+	bool operator<=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs);
+
+	template <class T, class Alloc>
+	bool operator>(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs);
+
+	template <class T, class Alloc>
+	bool operator>=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs);
 }
 
 #endif // __VECTOR_H__
