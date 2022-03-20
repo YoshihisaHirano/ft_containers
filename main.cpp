@@ -135,15 +135,15 @@ int main()
 	std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
 	avect.assign(5, 90);
 	std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
-	// avect = otherVect;
-	// std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
+	avect = otherVect;
+	std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
 
-	// std::vector<int>::iterator it = otherVect.begin();
-	// std::vector<int>::iterator ite = otherVect.end();
-	// avect.assign(it, ite);
-	// std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
-	// avect.assign(thirdVect.begin(), thirdVect.end());
-	// std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
+	std::vector<int>::iterator it = otherVect.begin();
+	std::vector<int>::iterator ite = otherVect.end();
+	avect.assign(it, ite);
+	std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
+	avect.assign(thirdVect.begin(), thirdVect.end());
+	std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
 	}
 
 	{
@@ -157,14 +157,14 @@ int main()
 	std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
 	avect.assign(5, 90);
 	std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
-	// avect = otherVect;
-	// std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
-	// ft::vector<int>::iterator it = otherVect.begin();
-	// ft::vector<int>::iterator ite = otherVect.end();
-	// avect.assign(it, ite);
-	// std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
-	// avect.assign(thirdVect.begin(), thirdVect.end());
-	// std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
+	avect = otherVect;
+	std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
+	ft::vector<int>::iterator it = otherVect.begin();
+	ft::vector<int>::iterator ite = otherVect.end();
+	avect.assign(it, ite);
+	std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
+	avect.assign(thirdVect.begin(), thirdVect.end());
+	std::cout << "size: " << avect.size() << " capacity "  << avect.capacity() << " back: " << avect.back() << std::endl;
 	}
 
 	{
