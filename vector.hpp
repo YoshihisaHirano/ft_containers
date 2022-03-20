@@ -383,8 +383,8 @@ namespace ft {
 		// };
 
 		void			swap(vector& other) {
-			// if (other == *this)
-			// 	return;
+			if (other == *this)
+				return;
 
 			pointer tempData = this->_data;
 			size_type tempSize = this->_size;
@@ -404,10 +404,12 @@ namespace ft {
 
 	template <class T, class Alloc>
 	bool operator==(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
-		if (lhs.size() != rhs.size()) { return false; }
-		vector<T,Alloc>::iterator it1 = lhs.begin();
-		vector<T,Alloc>::iterator it2 = rhs.begin();
-		for (; it1 != lhs.end(); ++it1, ++it2) {
+		if (lhs.size() != rhs.size()) {
+			return false;
+		}
+		typename vector<T,Alloc>::iterator it1 = lhs.cbegin();
+		typename vector<T,Alloc>::iterator it2 = rhs.cbegin();
+		for (; it1 != lhs.cend(); ++it1, ++it2) {
 			if (*it1 != *it2) { return false; }
 		}
 		return true;
