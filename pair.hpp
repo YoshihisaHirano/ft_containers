@@ -1,5 +1,5 @@
-#ifndef __PAIR_H__
-#define __PAIR_H__
+#ifndef __FT_PAIR_H__
+#define __FT_PAIR_H__
 
 namespace ft {
 	template <typename T1, typename T2>
@@ -60,4 +60,4 @@ namespace ft {
 	};
 }
 
-#endif // __PAIR_H__
+#endif // __FT_PAIR_H__
