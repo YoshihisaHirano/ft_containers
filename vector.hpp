@@ -20,10 +20,10 @@ namespace ft {
 		typedef typename iterator_traits<T*>::reference			reference;
 		typedef typename iterator_traits<T*>::difference_type	difference_type;
 
-		vectorIterator() : ptr(nullptr) {};
+		vectorIterator() : ptr(NULL) {};
 		vectorIterator(pointer pointer) : ptr(pointer) {};
 		vectorIterator(const vectorIterator& other) : ptr(other.ptr) {};
-		~vectorIterator() { this->ptr = nullptr; };
+		~vectorIterator() { this->ptr = NULL; };
 
 		vectorIterator &operator=(const vectorIterator& other) { 
 			ptr = other.ptr;
@@ -177,11 +177,11 @@ namespace ft {
 
 	public:
 		vector(const allocator_type& alloc = allocator_type()) 
-		: _size(0), _capacity(0), _data(nullptr), _alloc(alloc) {};
+		: _size(0), _capacity(0), _data(NULL), _alloc(alloc) {};
 
 		template <class InputIterator>
         vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), 
-				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = nullptr)
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL)
 		: _alloc(alloc) {
 			difference_type	sizeWannabe = std::distance(first, last);
 			if (sizeWannabe < 0) { 
@@ -241,7 +241,7 @@ namespace ft {
 		void			clear() {
 			this->_removeData(this->begin(), this->end());
 			this->_alloc.deallocate(this->_data, this->_capacity);
-			this->_reassignVector(nullptr, 0, 0);
+			this->_reassignVector(NULL, 0, 0);
 		};
 
 		bool			empty() const { return (this->_size == 0); };
@@ -337,7 +337,7 @@ namespace ft {
 
 		template <class InputIterator>
 		void			assign (InputIterator first, InputIterator last,
-					typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = nullptr) {
+					typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL) {
 			difference_type sdst = std::distance(first, last);
 			if (sdst < 0)
 				throw std::range_error("Error: Wrong iterators range!");
@@ -391,7 +391,7 @@ namespace ft {
 
 		template <class InputIterator>
 		void			insert(iterator position, InputIterator first, InputIterator last, 
-					typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = nullptr) {
+					typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL) {
 			difference_type sdst = std::distance(first, last);
 			if (sdst < 0)
 				throw std::range_error("Error: Wrong iterators range!");
