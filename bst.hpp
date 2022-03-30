@@ -172,6 +172,12 @@ namespace ft {
 			this->clear(this->root);
 		};
 
+		bs_tree	&operator=(const bs_tree &other) {
+			this->clear();
+			this->root = this->_clone(other.root);
+			return *this;
+		};
+
 		bool	empty() const { return this->root == NULL; };
 
 		void	clear(node *rootNode) { 
