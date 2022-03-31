@@ -1,4 +1,4 @@
-SRC		=	main.cpp
+SRC		=	mmain.cpp
 HDRS	=	vector.hpp iterator.hpp equal.hpp pair.hpp stack.hpp is_integral.hpp enable_if.hpp bst.hpp map.hpp
 NAME	=	ft_containers
 

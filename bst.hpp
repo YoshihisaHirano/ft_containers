@@ -17,21 +17,21 @@ namespace ft {
 		: value(value), left(lt), right(rt), parent(pt) {};
 	};
 
-	template <typename T>
-	class bst_iterator : public iterator_traits<T*> {
-		private:
-		friend class bs_tree<T>;
-		friend bool operator==(const bst_iterator<T>& lhs, const bst_iterator<T>& rhs);
+	template <typename T >
+	class bs_tree {
 
-		bst_node<T>	*position;
-		bs_tree<T>	*tree;
-		bst_iterator(const bst_node<T> pos, const bs_tree tr) : position(pos), tree(tr) {};
+		class bst_iterator : public iterator_traits<T*> {
+		private:
+
+		bst_node<T>			*position;
+		const bs_tree<T>	*tree;
 
 		public:
-		typedef typename iterator_traits<T*>::reference			reference;
+		typedef typename iterator_traits<T*>::reference	reference;
 
 		bst_iterator() : position(NULL), tree(NULL) {};
 		bst_iterator(const bst_iterator& other) : position(other.position), tree(other.tree) {};
+		bst_iterator(bst_node<T> *pos, const bs_tree<T> *tr) : position(pos), tree(tr) {};
 		~bst_iterator() {};
 
 		bst_iterator	&operator=(const bst_iterator& other) {
@@ -49,13 +49,13 @@ namespace ft {
 			}
 			if (this->position->right != NULL) {
 				this->position = this->position->right;
-				while (this->position->left ! = NULL)
+				while (this->position->left != NULL)
 					this->position = this->position->left;
 			} else {
 				bst_node<T>	*tmp = this->position->parent;
 				while (tmp != NULL && this->position == tmp->right) { 
 					this->position = tmp;
-					tpm = tmp->parent;
+					tmp = tmp->parent;
 				}
 				this->position = tmp;
 			}
@@ -86,7 +86,7 @@ namespace ft {
 				bst_node<T>	*tmp = this->position->parent;
 				while (tmp != NULL && this->position == tmp->left) { 
 					this->position = tmp;
-					tpm = tmp->parent;
+					tmp = tmp->parent;
 				}
 				this->position = tmp;
 			}
@@ -98,23 +98,19 @@ namespace ft {
 			this->operator--();
 			return temp;
 		};
+
+		bool operator==(const bst_iterator& rhs) {
+			return (rhs.position == this->position && rhs.tree == this->tree);
+		};
+
+		bool operator!=(const bst_iterator& rhs) {
+			return !(rhs == this);
+		};
 	};
 
-	template <typename T>
-	bool operator==(const bst_iterator<T>& lhs, const bst_iterator<T>& rhs) {
-		return (rhs.position == lhs.position && rhs.tree == lhs.tree);
-	};
-
-	template <typename T>
-	bool operator!=(const bst_iterator<T>& lhs, const bst_iterator<T>& rhs) {
-		return !(rhs == lhs);
-	};
-
-	template <typename T>
-	class bs_tree {
 		public:
 		typedef bst_node<T>		node;
-		typedef bst_iterator<T>	const_iterator;
+		typedef bst_iterator	const_iterator;
 		typedef const_iterator	iterator;
 
 		private:
@@ -122,7 +118,7 @@ namespace ft {
 
 		node	*_insert(const T &val, node *subtreeRoot, node *parent) {
 			if (subtreeRoot == NULL) {
-				subtreeRoot = new bst_node(val, NULL, NULL, parent);
+				subtreeRoot = new node(val, NULL, NULL, parent);
 				return subtreeRoot;
 			}
 			else if (val < subtreeRoot->value)
@@ -137,9 +133,9 @@ namespace ft {
 			if (subtreeRoot == NULL)
 				return false;
 			if (val < subtreeRoot->value)
-				return this->_remove(val, subtree->left);
+				return this->_remove(val, subtreeRoot->left);
 			if (val > subtreeRoot->value)
-				return this->_remove(val, subtree->right);
+				return this->_remove(val, subtreeRoot->right);
 			if (subtreeRoot->left != NULL && subtreeRoot->right != NULL) {
 				subtreeRoot->value = this->findMin(subtreeRoot->right)->value;
 				this->_remove(subtreeRoot->value, subtreeRoot->right);
@@ -189,28 +185,24 @@ namespace ft {
 			rootNode = NULL;
 		};
 
-		node	*findMin() {
-			if (this->empty())
-				throw std::underflow_error("The tree is empty!");
+		iterator	findMin() const {
 			node *res = this->root;
 			while (res != NULL)
 				res = res->left;
-			return (res);
+			return iterator(res, this);
 		};
 
-		node	*findMax() {
-			if (this->empty())
-				throw std::underflow_error("The tree is empty!");
+		iterator	findMax() const {
 			node *res = this->root;
 			while (res != NULL)
 				res = res->right;
-			return (res);
+			return iterator(res, this);
 		};
 
 		const node	*find(const T &val) const {
 			node *res = this->root;
 			while (res != NULL || res->value != val) {
-				res = (res->value < val) res->left : res->right;
+				res = (res->value < val) ? res->left : res->right;
 			}
 			return res;
 		};
@@ -218,19 +210,19 @@ namespace ft {
 		const_iterator	insert(const T &val) { 
 			node *res = this->_insert(val, this->root, NULL);
 			if (!res) { return this->end(); }
-			return bst_iterator(res, this);
+			return iterator(res, this);
 		};
 
 		void			remove(const T &val) {
 			this->_remove(val, this->root);
 		}
 
-		const_iterator	begin() const { 
-			return bst_iterator(this->findMin(), this);
+		iterator		begin() const { 
+			return this->findMin();
 		};
 
-		const_iterator	end() const { 
-			return bst_iterator(NULL, this);
+		iterator		end() const { 
+			return iterator(NULL, this);
 		};
 	};
 	
