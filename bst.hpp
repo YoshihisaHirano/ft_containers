@@ -142,14 +142,17 @@ namespace ft {
 				return this->_remove(val, subtreeRoot->right);
 			if (subtreeRoot->left != NULL && subtreeRoot->right != NULL) {
 				node *min = this->findMin(subtreeRoot->right);
-				subtreeRoot->value = min->value;
+				node *newParent = new node(min->value, subtreeRoot->left, subtreeRoot->right, subtreeRoot->parent);
+				delete subtreeRoot;
+				subtreeRoot = newParent;
 				this->_remove(subtreeRoot->value, subtreeRoot->right);
 				return true;
 			}
 			else {
 				node *toBeDeleted = subtreeRoot;
 				subtreeRoot = (subtreeRoot->left != NULL) ? subtreeRoot->left : subtreeRoot->right;
-				subtreeRoot->parent = toBeDeleted->parent;
+				if (subtreeRoot != NULL)
+					subtreeRoot->parent = toBeDeleted->parent;
 				delete toBeDeleted;
 				return true;
 			}
@@ -186,9 +189,8 @@ namespace ft {
 		public:
 		bs_tree(const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {};
 		bs_tree(node *root, const Compare& compare = std::less<T>()) : root(root), comp(compare) {};
-		bs_tree(const bs_tree &other) {
-			this->root = this->_clone(other.root);
-			this->comp = other.comp;
+		bs_tree(const bs_tree &other, const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {
+			this->root = this->_clone(other.root); //TOOD check what's wrong with clone, why adding two values
 		};
 		~bs_tree() {
 			this->clear();
@@ -252,7 +254,17 @@ namespace ft {
 			return iterator(NULL, this);
 		};
 
-		size_t	max_size() const { return std::allocator<bst_node<T> >().max_size(); }
+		size_t		max_size() const { return std::allocator<bst_node<T> >().max_size(); }
+
+		void		swap(bs_tree &x) { 
+			bst_node<T>	*tmpRoot = this->root;
+			Compare compObj = this->comp;
+
+			this->root = x.root;
+			this->comp = x.comp;
+			x.root = tmpRoot;
+			x.comp = compObj;
+		};
 
 		void		print() const {
 			this->_print(this->root);

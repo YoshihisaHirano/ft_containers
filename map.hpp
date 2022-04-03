@@ -54,13 +54,22 @@ namespace ft {
 		public:
 		map(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) 
 		: _data(NULL, value_compare(comp)), _size(0), _comp(comp), _alloc(alloc) {};
-		// template <class InputIterator>
-		// map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(),
-		// const allocator_type& alloc = allocator_type());
-		map(const map& x) : _data(x._data, value_compare(x._comp)), _size(x._size), _comp(x._comp), _alloc(x._alloc) {};
+
+		template <class InputIterator>
+		map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(),
+		const allocator_type& alloc = allocator_type()) 
+		: _data(NULL, value_compare(comp)), _size(0), _comp(comp), _alloc(alloc) { 
+			this->insert(first, last);
+		};
+
+		map(const map& x) : _data(NULL, value_compare(x._comp)), _size(0), _comp(x._comp), _alloc(x._alloc) {
+			this->insert(x.begin(), x.end());
+		};
+
 		~map() {
 			this->clear();
 		};
+
 		map& operator=(const map& x) { 
 			this->_data = x._data;
 			this->_size = x._size;
@@ -157,9 +166,50 @@ namespace ft {
 
 		void			erase (iterator position) {
 			this->_data.remove(*position);
+			this->_size--;
 		};
 
-		void			print() const { this->_data.print(); }; // to delete
+		size_type		erase (const key_type& k) {
+			iterator it = this->find(k);
+			std::cout << "key: " << k << std::endl;
+			if (it == this->end())
+				return 0;
+			this->_data.remove(*it);
+			this->_size--;
+			return 1;
+		};
+
+		void			erase (iterator first, iterator last) {
+			while (first != last)
+				this->erase((*(first++)).first);
+		};
+
+		void			swap (map& x) {
+			size_type	tmpSize = this->_size;
+			key_compare tmpComp = this->_comp;
+			allocator_type tmpAlloc = this->_alloc;
+
+			this->_data.swap(x._data);
+			this->_size = x._size;
+			this->_comp = x._comp;
+			this->_alloc = x._alloc;
+			x._alloc = tmpAlloc;
+			x._comp = tmpComp;
+			x._size = tmpSize;
+		};
+
+		pair<const_iterator,const_iterator> equal_range (const key_type& k) const { 
+			const_iterator itlow = this->lower_bound(k);
+			const_iterator itup = this->upper_bound(k);
+			return make_pair(itlow, itup);
+
+		};
+		pair<iterator,iterator>             equal_range (const key_type& k) {
+			iterator itlow = this->lower_bound(k);
+			iterator itup = this->upper_bound(k);
+			return ft::make_pair(itlow, itup);
+		};
+
 	};
 }
 

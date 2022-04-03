@@ -14,7 +14,6 @@ int main()
 	std::cout << "starting a for loop " << std::endl;
 	for (int i = 0; i < 10; i++)
 		mymap.insert(ft::pair<int, char>(i, i + 35));
-	// mymap.print();
 	mymap[11] = 'v';
 	std::cout << "mymap size: " << mymap.size() << std::endl;
 	ft::map<int, char>::iterator it = mymap.begin();
@@ -74,8 +73,83 @@ int main()
 	itup = mymap1.upper_bound('t');
 	std::cout << itup->first << " ==> " << itup->second << '\n';
 	std::cout << "___________" << std::endl;
+	{
 	ft::map<char,int>::iterator itс = mymap1.find('b');
-	mymap1.erase (itс);
+	mymap1.erase(itс);
+	itс = mymap1.find('p');
+	mymap1.erase(itс, mymap1.end());
+	std::cout << "mymap1 contains:\n";
+	for (ft::map<char,int>::iterator it=mymap1.begin(); it!=mymap1.end(); ++it)
+		std::cout << it->first << " => " << it->second << '\n';
+	std::cout << "___________" << std::endl;
+	}
+
+	{
+	ft::map<char,int> foo,bar;
+
+	foo['x']=100;
+	foo['y']=200;
+
+	bar['a']=11;
+	bar['b']=22;
+	bar['c']=33;
+
+	foo.swap(bar);
+
+	std::cout << "foo contains:\n";
+	for (ft::map<char,int>::iterator it=foo.begin(); it!=foo.end(); ++it)
+    std::cout << it->first << " => " << it->second << '\n';
+
+	std::cout << "bar contains:\n";
+	for (ft::map<char,int>::iterator it=bar.begin(); it!=bar.end(); ++it)
+    std::cout << it->first << " => " << it->second << '\n';
+	}
+
+		{
+		ft::map<char,int> mymap;
+
+		mymap['h']=111;
+		mymap['i']=222;
+		mymap['m']=333;
+		mymap['w']=444;
+
+		ft::pair<ft::map<char,int>::iterator,ft::map<char,int>::iterator> ret;
+		ret = mymap.equal_range('i');
+
+		std::cout << "lower bound points to: ";
+		std::cout << ret.first->first << " => " << ret.first->second << '\n';
+
+		std::cout << "upper bound points to: ";
+		std::cout << ret.second->first << " => " << ret.second->second << '\n';
+
+		ret = mymap.equal_range('p');
+
+		std::cout << "lower bound points to: ";
+		std::cout << ret.first->first << " => " << ret.first->second << '\n';
+
+		std::cout << "upper bound points to: ";
+		std::cout << ret.second->first << " => " << ret.second->second << '\n';
+	}
+
+	{
+		ft::map<char,int> first;
+
+		first['a']=10;
+		first['b']=30;
+		first['c']=50;
+		first['d']=70;
+
+		ft::map<char,int> second (first.begin(),first.end());
+		std::cout << "second contains:\n";
+		for (ft::map<char,int>::iterator it=second.begin(); it!=second.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+		ft::map<char,int> third (second);
+		std::cout << "third contains:\n";
+		for (ft::map<char,int>::iterator it=third.begin(); it!=third.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+		std::cout << "third size: " << third.size() << '\n';
+	}
+
 	std::cout << "_____ft_____end______" << std::endl;
 	}
 	{
@@ -88,7 +162,6 @@ int main()
 	std::cout << "starting a for loop " << std::endl;
 	for (int i = 0; i < 10; i++)
 		mymap.insert(std::pair<int, char>(i, i + 35));
-	// mymap.print();
 	mymap[11] = 'v';
 	std::cout << "mymap size: " << mymap.size() << std::endl;
 	std::map<int, char>::iterator it = mymap.begin();
@@ -121,7 +194,6 @@ int main()
 	std::cout << "anothermap contains:\n";
 	for (it=anothermap.begin(); it!=anothermap.end(); ++it)
 		std::cout << it->first << " => " << it->second << '\n';
-	}
 
 	std::map<char,int> mymap1;
 	std::map<char,int>::iterator itlow,itup;
@@ -149,7 +221,81 @@ int main()
 	itup = mymap1.upper_bound('t');
 	std::cout << itup->first << " ==> " << itup->second << '\n';
 	std::cout << "___________" << std::endl;
+	{
 	std::map<char,int>::iterator itс = mymap1.find('b');
-	mymap1.erase (itс);
+	mymap1.erase(itс);
+	itс = mymap1.find('p');
+	mymap1.erase(itс, mymap1.end());
+	std::cout << "mymap1 contains:\n";
+	for (std::map<char,int>::iterator it=mymap1.begin(); it!=mymap1.end(); ++it)
+		std::cout << it->first << " => " << it->second << '\n';
+	std::cout << "___________" << std::endl;
+	}
+	{
+	std::map<char,int> foo,bar;
+
+	foo['x']=100;
+	foo['y']=200;
+
+	bar['a']=11;
+	bar['b']=22;
+	bar['c']=33;
+
+	foo.swap(bar);
+
+	std::cout << "foo contains:\n";
+	for (std::map<char,int>::iterator it=foo.begin(); it!=foo.end(); ++it)
+    std::cout << it->first << " => " << it->second << '\n';
+
+	std::cout << "bar contains:\n";
+	for (std::map<char,int>::iterator it=bar.begin(); it!=bar.end(); ++it)
+		std::cout << it->first << " => " << it->second << '\n';
+	}
+
+	{
+		std::map<char,int> mymap;
+
+		mymap['h']=111;
+		mymap['i']=222;
+		mymap['m']=333;
+		mymap['w']=444;
+
+		std::pair<std::map<char,int>::iterator,std::map<char,int>::iterator> ret;
+		ret = mymap.equal_range('i');
+
+		std::cout << "lower bound points to: ";
+		std::cout << ret.first->first << " => " << ret.first->second << '\n';
+
+		std::cout << "upper bound points to: ";
+		std::cout << ret.second->first << " => " << ret.second->second << '\n';
+
+		ret = mymap.equal_range('p');
+
+		std::cout << "lower bound points to: ";
+		std::cout << ret.first->first << " => " << ret.first->second << '\n';
+
+		std::cout << "upper bound points to: ";
+		std::cout << ret.second->first << " => " << ret.second->second << '\n';
+	}
+
+	{
+		std::map<char,int> first;
+
+		first['a']=10;
+		first['b']=30;
+		first['c']=50;
+		first['d']=70;
+
+		std::map<char,int> second (first.begin(),first.end());
+		std::cout << "second contains:\n";
+		for (std::map<char,int>::iterator it=second.begin(); it!=second.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+		std::map<char,int> third (second);
+		std::cout << "third contains:\n";
+		for (std::map<char,int>::iterator it=third.begin(); it!=third.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+	}
+
+	}
 	return 0;
 }
