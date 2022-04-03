@@ -38,31 +38,38 @@ namespace ft {
 		typedef	typename allocator_type::const_reference			const_reference;
 		typedef	typename allocator_type::pointer					pointer;
 		typedef typename allocator_type::const_pointer				const_pointer;
-		typedef typename bs_tree<value_type>::iterator				iterator;
-		typedef typename bs_tree<value_type>::const_iterator		const_iterator;
+		typedef typename bs_tree<value_type, value_compare>::iterator				iterator;
+		typedef typename bs_tree<value_type, value_compare>::const_iterator		const_iterator;
 		typedef const reverse_iterator<iterator>					const_reverse_iterator;
 		typedef reverse_iterator<iterator >							reverse_iterator;
 		typedef	unsigned long										size_type;
 		typedef	ptrdiff_t											difference_type;
 
 		private:
-		bs_tree<value_type>	_data;
-		size_type			_size;
-		key_compare			_comp;
-		allocator_type		_alloc;
+		bs_tree<value_type, value_compare>	_data;
+		size_type							_size;
+		key_compare							_comp;
+		allocator_type						_alloc;
 
 		public:
 		map(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) 
-		: _data(), _size(0), _comp(comp), _alloc(alloc) {};
+		: _data(NULL, value_compare(comp)), _size(0), _comp(comp), _alloc(alloc) {};
 		// template <class InputIterator>
 		// map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(),
 		// const allocator_type& alloc = allocator_type());
-		map(const map& x) : _data(x._data), _size(x._size), _comp(x._comp), _alloc(x._alloc) {};
+		map(const map& x) : _data(x._data, value_compare(x._comp)), _size(x._size), _comp(x._comp), _alloc(x._alloc) {};
+		~map() {
+			this->clear();
+		};
 		map& operator=(const map& x) { 
 			this->_data = x._data;
 			this->_size = x._size;
 			this->_comp = x._comp;
 			return *this;
+		};
+
+		mapped_type& operator[] (const key_type& k) {
+			return (*((this->insert(make_pair(k,mapped_type()))).first)).second;
 		};
 
 		iterator		begin() { return this->_data.begin(); };
@@ -76,13 +83,83 @@ namespace ft {
 		bool			empty() const { return this->_size == 0; };
 		allocator_type	get_allocator() const { return allocator_type(); };
 		key_compare		key_comp() const { return key_compare(); };
-		size_type		max_size() const { return this->_alloc.max_size(); }; //check with regards to additional data (pointers)
+		value_compare	value_comp() const { return value_compare(key_compare()); };
+		size_type		max_size() const { return this->_data.max_size(); };
 		size_type		size() const { return this->_size; };
 
 		void			clear() { 
 			this->_size = 0;
 			this->_data.clear();
 		};
+
+		iterator		find(const key_type& k) { 
+			pair<key_type, mapped_type> val(k, mapped_type());
+			iterator it = this->_data.find(val);
+			return it;
+		};
+
+		const_iterator	find(const key_type& k) const { 
+			pair<key_type, mapped_type> val(k, mapped_type());
+			const_iterator it = this->_data.find(val);
+			return it;
+		};
+
+		size_type		count(const key_type& k) const {
+			return (this->find(k) == this->_data.end()) ? 0 : 1;
+		};
+
+		pair<iterator,bool>	insert(const value_type& val) { 
+			iterator it = this->_data.insert(val);
+			if (it == this->end())
+				return pair<iterator,bool>(it, false);
+			this->_size++;
+			return pair<iterator,bool>(it, true);
+		};
+
+		iterator		insert(iterator position, const value_type& val) {
+			(void)position;
+			return this->insert(val).first;
+		};
+
+		template <class InputIterator>
+		void		insert(InputIterator first, InputIterator last) {
+			for (; first != last; ++first)
+				this->insert(*first);
+		};
+
+		iterator		lower_bound (const key_type& k) { 
+			iterator it = this->find(k);
+			if (it != this->end())
+				return it;
+			for (it = this->begin(); it != this->end(); ++it) {
+				if (!this->_comp(it->first, k))
+					break;
+			}
+			return it;
+		};
+
+		const_iterator	lower_bound (const key_type& k) const { 
+			return const_iterator(this->lower_bound(k));
+		};
+
+		iterator		upper_bound (const key_type& k) {
+			iterator it = this->begin();
+			for (; it != this->end(); ++it) {
+				if (this->_comp(k, it->first))
+					break;
+			}
+			return it;
+		};
+
+		const_iterator	upper_bound (const key_type& k) const { 
+			return const_iterator(this->upper_bound(k));
+		};
+
+		void			erase (iterator position) {
+			this->_data.remove(*position);
+		};
+
+		void			print() const { this->_data.print(); }; // to delete
 	};
 }
 

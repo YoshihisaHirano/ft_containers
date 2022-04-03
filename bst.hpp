@@ -2,6 +2,8 @@
 #define __FT_BST_H__
 #include <memory>
 #include <exception>
+#include <iostream>
+#include <iterator>
 #include "iterator.hpp"
 
 namespace ft {
@@ -17,21 +19,22 @@ namespace ft {
 		: value(value), left(lt), right(rt), parent(pt) {};
 	};
 
-	template <typename T >
+	template <typename T, class Compare = std::less<T> >
 	class bs_tree {
 
-		class bst_iterator : public iterator_traits<T*> {
+		class bst_iterator : public std::iterator<std::bidirectional_iterator_tag, T> {
 		private:
 
-		bst_node<T>			*position;
-		const bs_tree<T>	*tree;
+		bst_node<T>					*position;
+		const bs_tree<T, Compare>	*tree;
 
 		public:
-		typedef typename iterator_traits<T*>::reference	reference;
+		typedef typename std::iterator<std::bidirectional_iterator_tag, T>::reference reference;
+		typedef typename std::iterator<std::bidirectional_iterator_tag, T>::pointer   pointer;
 
 		bst_iterator() : position(NULL), tree(NULL) {};
 		bst_iterator(const bst_iterator& other) : position(other.position), tree(other.tree) {};
-		bst_iterator(bst_node<T> *pos, const bs_tree<T> *tr) : position(pos), tree(tr) {};
+		bst_iterator(bst_node<T> *pos, const bs_tree<T, Compare> *tr) : position(pos), tree(tr) {};
 		~bst_iterator() {};
 
 		bst_iterator	&operator=(const bst_iterator& other) {
@@ -41,10 +44,10 @@ namespace ft {
 		};
 
 		const reference		operator*() const { return this->position->value; };
-		const bst_node<T>	*operator->() const { return this->position; };
+		const pointer		operator->() const { return &(this->position->value); };
 
 		bst_iterator		&operator++() {
-			if (this->tree.empty()) {
+			if (this->tree->empty()) {
 				throw std::underflow_error("Trying to increment over an empty tree");
 			}
 			if (this->position->right != NULL) {
@@ -62,14 +65,14 @@ namespace ft {
 			return *this;
 		};
 
-		bst_iterator		&operator++(int) {
+		bst_iterator		operator++(int) {
 			bst_iterator temp = *this;
 			this->operator++();
 			return temp;
 		};
 
 		bst_iterator		&operator--() {
-			if (this->tree.empty()) {
+			if (this->tree->empty()) {
 				throw std::underflow_error("Trying to decrement over an empty tree");
 			}
 			if (this->position == NULL) {
@@ -93,51 +96,53 @@ namespace ft {
 			return *this;
 		};
 
-		bst_iterator		&operator--(int) {
+		bst_iterator		operator--(int) {
 			bst_iterator temp = *this;
 			this->operator--();
 			return temp;
 		};
 
-		bool operator==(const bst_iterator& rhs) {
+		bool operator==(const bst_iterator& rhs) const {
 			return (rhs.position == this->position && rhs.tree == this->tree);
 		};
 
-		bool operator!=(const bst_iterator& rhs) {
-			return !(rhs == this);
+		bool operator!=(const bst_iterator& rhs) const {
+			return !(rhs.operator==(*this));
 		};
 	};
 
 		public:
 		typedef bst_node<T>		node;
-		typedef bst_iterator	const_iterator;
-		typedef const_iterator	iterator;
+		typedef bst_iterator	iterator;
+		typedef const iterator	const_iterator;
 
 		private:
-		node	*root;
+		node			*root;
+		Compare			comp;
 
-		node	*_insert(const T &val, node *subtreeRoot, node *parent) {
+		node	*_insert(const T &val, node * &subtreeRoot, node *parent) {
 			if (subtreeRoot == NULL) {
 				subtreeRoot = new node(val, NULL, NULL, parent);
 				return subtreeRoot;
 			}
-			else if (val < subtreeRoot->value)
+			else if (comp(val, subtreeRoot->value))
 				return this->_insert(val, subtreeRoot->left, subtreeRoot);
-			else if (val > subtreeRoot->value)
+			else if (comp(subtreeRoot->value, val))
 				return this->_insert(val, subtreeRoot->right, subtreeRoot);
 			else
 				return NULL;
 		};
 
-		bool	_remove(const T &val, node *subtreeRoot) {
+		bool	_remove(const T &val, node * &subtreeRoot) {
 			if (subtreeRoot == NULL)
 				return false;
-			if (val < subtreeRoot->value)
+			if (comp(val, subtreeRoot->value))
 				return this->_remove(val, subtreeRoot->left);
-			if (val > subtreeRoot->value)
+			if (comp(subtreeRoot->value, val))
 				return this->_remove(val, subtreeRoot->right);
 			if (subtreeRoot->left != NULL && subtreeRoot->right != NULL) {
-				subtreeRoot->value = this->findMin(subtreeRoot->right)->value;
+				node *min = this->findMin(subtreeRoot->right);
+				subtreeRoot->value = min->value;
 				this->_remove(subtreeRoot->value, subtreeRoot->right);
 				return true;
 			}
@@ -158,71 +163,99 @@ namespace ft {
 				this->_clone(subtreeRoot->right), subtreeRoot->parent);
 		};
 
+		void	_print(node *subtreeRoot) const {
+			if (subtreeRoot == NULL)
+			{
+				std::cout << std::endl;
+				return;
+			}
+			this->_print(subtreeRoot->left);
+			std::cout << subtreeRoot->value << " " << std::endl;
+			this->_print(subtreeRoot->right);
+		};
+
+		void	_clear(node * &subtreeRoot) {
+			if (subtreeRoot != NULL) {
+				this->_clear(subtreeRoot->left);
+				this->_clear(subtreeRoot->right);
+				delete subtreeRoot;
+			}
+			subtreeRoot = NULL;
+		};
+
 		public:
-		bs_tree() : root(NULL) {};
-		bs_tree(node *root) : root(root) {};
+		bs_tree(const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {};
+		bs_tree(node *root, const Compare& compare = std::less<T>()) : root(root), comp(compare) {};
 		bs_tree(const bs_tree &other) {
 			this->root = this->_clone(other.root);
+			this->comp = other.comp;
 		};
 		~bs_tree() {
-			this->clear(this->root);
+			this->clear();
 		};
 
 		bs_tree	&operator=(const bs_tree &other) {
-			this->clear();
+			this->clear(this->root);
 			this->root = this->_clone(other.root);
+			this->comp = other.comp;
 			return *this;
 		};
 
 		bool	empty() const { return this->root == NULL; };
+		node	*getRoot() { return this->root; };
 
-		void	clear(node *rootNode) { 
-			if (rootNode != NULL) {
-				clear(rootNode->left);
-				clear(rootNode->right);
-				delete rootNode; // maybe allocator?
+		void	clear() { 
+			this->_clear(this->root);
+		};
+
+		node	*findMin(node *subtreeRoot) const {
+			if (subtreeRoot != NULL) {
+				while (subtreeRoot->left != NULL)
+				subtreeRoot = subtreeRoot->left;
 			}
-			rootNode = NULL;
+			return subtreeRoot;
 		};
 
-		iterator	findMin() const {
-			node *res = this->root;
-			while (res != NULL)
-				res = res->left;
-			return iterator(res, this);
-		};
-
-		iterator	findMax() const {
-			node *res = this->root;
-			while (res != NULL)
-				res = res->right;
-			return iterator(res, this);
-		};
-
-		const node	*find(const T &val) const {
-			node *res = this->root;
-			while (res != NULL || res->value != val) {
-				res = (res->value < val) ? res->left : res->right;
+		node	*findMax(node *subtreeRoot) const {
+			if (subtreeRoot != NULL) {
+				while (subtreeRoot->right != NULL)
+				subtreeRoot = subtreeRoot->right;
 			}
-			return res;
+			return subtreeRoot, this;
 		};
 
-		const_iterator	insert(const T &val) { 
+		iterator	find(const T &val) const {
+			node *res = this->root;
+			while (res != NULL) {
+				if (!comp(res->value, val) && !comp(val, res->value)) 
+					return iterator(res, this);
+				res = (comp(val, res->value)) ? res->left : res->right;
+			}
+			return this->end();
+		};
+
+		iterator	insert(const T &val) { 
 			node *res = this->_insert(val, this->root, NULL);
 			if (!res) { return this->end(); }
 			return iterator(res, this);
 		};
 
-		void			remove(const T &val) {
-			this->_remove(val, this->root);
+		bool		remove(const T &val) {
+			return this->_remove(val, this->root);
 		}
 
-		iterator		begin() const { 
-			return this->findMin();
+		iterator	begin() const { 
+			return iterator(this->findMin(this->root), this);
 		};
 
-		iterator		end() const { 
+		iterator	end() const { 
 			return iterator(NULL, this);
+		};
+
+		size_t	max_size() const { return std::allocator<bst_node<T> >().max_size(); }
+
+		void		print() const {
+			this->_print(this->root);
 		};
 	};
 	
