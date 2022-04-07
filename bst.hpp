@@ -10,23 +10,28 @@ namespace ft {
 	template <typename T>
 	struct bst_node
 	{
-		T			value;
-		bst_node	*left;
-		bst_node	*right;
-		bst_node	*parent;
+		typedef bst_node* node;
 
-		bst_node(T value, bst_node *lt = NULL, bst_node *rt = NULL, bst_node *pt = NULL)
+		T			value;
+		node		left;
+		node		right;
+		node		parent;
+
+		bst_node(T value, node lt = NULL, node rt = NULL, node pt = NULL)
 		: value(value), left(lt), right(rt), parent(pt) {};
 	};
 
 	template <typename T, class Compare = std::less<T> >
 	class bs_tree {
+		protected:
+		typedef bst_node<T>			node;
+		typedef bs_tree<T, Compare>	tree;
 
 		class bst_iterator : public std::iterator<std::bidirectional_iterator_tag, T> {
 		private:
 
-		bst_node<T>					*position;
-		const bs_tree<T, Compare>	*tree;
+		node		*position;
+		const tree	*tree;
 
 		public:
 		typedef typename std::iterator<std::bidirectional_iterator_tag, T>::reference reference;
@@ -110,13 +115,11 @@ namespace ft {
 			return !(rhs.operator==(*this));
 		};
 	};
-
 		public:
-		typedef bst_node<T>		node;
 		typedef bst_iterator	iterator;
 		typedef const iterator	const_iterator;
 
-		private:
+		protected:
 		node			*root;
 		Compare			comp;
 
@@ -189,14 +192,14 @@ namespace ft {
 		public:
 		bs_tree(const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {};
 		bs_tree(node *root, const Compare& compare = std::less<T>()) : root(root), comp(compare) {};
-		bs_tree(const bs_tree &other, const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {
+		bs_tree(const tree &other, const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {
 			this->root = this->_clone(other.root); //TOOD check what's wrong with clone, why adding two values
 		};
-		~bs_tree() {
+		virtual ~bs_tree() {
 			this->clear();
 		};
 
-		bs_tree	&operator=(const bs_tree &other) {
+		bs_tree	&operator=(const tree &other) {
 			this->clear(this->root);
 			this->root = this->_clone(other.root);
 			this->comp = other.comp;
@@ -270,7 +273,49 @@ namespace ft {
 			this->_print(this->root);
 		};
 	};
-	
+
+	template <class T, class Compare>
+	bool	operator==(const bs_tree<T,Compare>& lhs, const bs_tree<T,Compare>& rhs) {
+		typename bs_tree<T,Compare>::iterator itl = lhs.begin();
+		typename bs_tree<T,Compare>::iterator itr = rhs.begin();
+		for (; itl != lhs.end(); ++itl, ++itr) {
+			if (*itl != *itr) { return false; }
+		}
+		return true;
+	};
+
+	template <class T, class Compare>
+	bool	operator!=(const bs_tree<T,Compare>& lhs, const bs_tree<T,Compare>& rhs) {
+		return !(rhs == lhs);
+	};	
+
+	template <class T, class Compare>
+	bool	operator<(const bs_tree<T,Compare>& lhs, const bs_tree<T,Compare>& rhs) {
+		typename bs_tree<T,Compare>::iterator first1 = lhs.begin();
+		typename bs_tree<T,Compare>::iterator first2 = rhs.begin();
+		typename bs_tree<T,Compare>::iterator last1 = lhs.end();
+		typename bs_tree<T,Compare>::iterator last2 = rhs.end();
+		for (; first1 != last1; first1++, first2++) {
+			if (first2 == last2 || (*first2 < *first1)) { return false; }
+			else if (*first1 < *first2) { return true; }
+		}
+		return (*first2 != *last2);
+	};
+
+	template <class T, class Compare>
+	bool	operator<=(const bs_tree<T,Compare>& lhs, const bs_tree<T,Compare>& rhs) {
+		return !(lhs > rhs);
+	};
+
+	template <class T, class Compare>
+	bool	operator>(const bs_tree<T,Compare>& lhs, const bs_tree<T,Compare>& rhs) {
+		return (rhs < lhs);
+	};
+
+	template <class T, class Compare>
+	bool	operator>=(const bs_tree<T,Compare>& lhs, const bs_tree<T,Compare>& rhs) {
+		return !(lhs < rhs);
+	};
 }
 
 #endif //__FT_BST_H__

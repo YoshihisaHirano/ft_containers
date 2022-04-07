@@ -209,7 +209,55 @@ namespace ft {
 			iterator itup = this->upper_bound(k);
 			return ft::make_pair(itlow, itup);
 		};
+	};
 
+	template <class Key, class T, class Compare, class Alloc>
+	void	swap (map<Key,T,Compare,Alloc>& x, map<Key,T,Compare,Alloc>& y) {
+		x.swap(y);
+	};
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator==(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
+		if (lhs.size() != rhs.size()) { return false; }
+		typename map<Key,T,Compare,Alloc>::iterator itl = lhs.begin();
+		typename map<Key,T,Compare,Alloc>::iterator itr = rhs.begin();
+		for (; itl != lhs.end(); ++itl, ++itr) {
+			if (*itl != *itr) { return false; }
+		}
+		return true;
+	};
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator!=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
+		return !(lhs == rhs);
+	};
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
+		typename map<Key,T,Compare,Alloc>::iterator first1 = lhs.begin();
+		typename map<Key,T,Compare,Alloc>::iterator first2 = rhs.begin();
+		typename map<Key,T,Compare,Alloc>::iterator last1 = lhs.end();
+		typename map<Key,T,Compare,Alloc>::iterator last2 = rhs.end();
+		for (; first1 != last1; first1++, first2++) {
+			if (first2 == last2 || (*first2 < *first1)) { return false; }
+			else if (*first1 < *first2) { return true; }
+		}
+		return (*first2 != *last2);
+	};
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
+		return !(lhs > rhs);
+	};
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
+		return (rhs < lhs);
+	};
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
+		return !(lhs < rhs);
 	};
 }
 

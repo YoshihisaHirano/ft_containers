@@ -150,6 +150,21 @@ int main()
 		std::cout << "third size: " << third.size() << '\n';
 	}
 
+	{
+		ft::map<char,int> foo,bar;
+		foo['a']=100;
+		foo['b']=200;
+		bar['a']=10;
+		bar['z']=1000;
+
+		if (foo==bar) std::cout << "foo and bar are equal\n";
+		if (foo!=bar) std::cout << "foo and bar are not equal\n";
+		if (bar<foo) std::cout << "bar is less than foo\n";
+		if (foo>bar) std::cout << "foo is greater than bar\n";
+		if (bar<=foo) std::cout << "bar is less than or equal to foo\n";
+		if (foo>=bar) std::cout << "foo is greater than or equal to bar\n";
+	}
+
 	std::cout << "_____ft_____end______" << std::endl;
 	}
 	{
@@ -294,6 +309,21 @@ int main()
 		std::cout << "third contains:\n";
 		for (std::map<char,int>::iterator it=third.begin(); it!=third.end(); ++it)
 			std::cout << it->first << " => " << it->second << '\n';
+	}
+
+	{
+		std::map<char,int> foo,bar;
+		foo['a']=100;
+		foo['b']=200;
+		bar['a']=10;
+		bar['z']=1000;
+
+		if (foo==bar) std::cout << "foo and bar are equal\n";
+		if (foo!=bar) std::cout << "foo and bar are not equal\n";
+		if (bar<foo) std::cout << "bar is less than foo\n";
+		if (foo>bar) std::cout << "foo is greater than bar\n";
+		if (bar<=foo) std::cout << "bar is less than or equal to foo\n";
+		if (foo>=bar) std::cout << "foo is greater than or equal to bar\n";
 	}
 
 	}
