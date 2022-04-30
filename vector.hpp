@@ -68,14 +68,14 @@ namespace ft {
 			return (*this);
 		}
 
-		vectorIterator operator+(int val) {
+		vectorIterator operator+(difference_type val) const {
 			vectorIterator  tmp(*this);
-			return (tmp += val);
+			return vectorIterator(tmp += val);
 		}
 
-		vectorIterator operator-(int val) {
+		vectorIterator operator-(difference_type val) const {
 			vectorIterator  tmp(*this);
-			return (tmp -= val);
+			return vectorIterator(tmp -= val);
 		}
 
 		difference_type operator-(const vectorIterator& other) {
@@ -148,7 +148,7 @@ namespace ft {
 				this->_alloc.construct(it.getPointer(), val);
 		};
 
-		size_type	_newCapacity(size_type currSize) { return (static_cast<int>(currSize * 1.5)); };
+		size_type	_newCapacity(size_type currSize) { return (static_cast<int>(currSize * 2)); };
 
 		void		_reassignVector(pointer newData, size_type newCapacity, size_type newSize)
 		{
@@ -157,11 +157,16 @@ namespace ft {
 			this->_size = newSize;
 		}
 
-		void		_reAlloc(size_type newCapacity) { 
+		void		_reAlloc(size_type newCapacity) {
 			pointer tempAllloc = this->_alloc.allocate(newCapacity);
-			std::copy(this->begin(), this->end(), iterator(tempAllloc));
+			if (this->_size > 0) {
+				std::copy(this->begin(), this->end(), iterator(tempAllloc));
+			}
 			this->_removeData(this->begin(), this->end());
-			this->_alloc.deallocate(this->_data, this->_capacity);
+			if (this->_data) {
+				this->_alloc.deallocate(this->_data, this->_capacity);
+				this->_data = NULL;
+			}
 			this->_reassignVector(tempAllloc, newCapacity, this->_size);
 		};
 
@@ -174,6 +179,12 @@ namespace ft {
 			if (this->empty())
 				throw std::underflow_error("Error: Trying to access objects inside an empty vector!");
 		};
+
+		void		_fullClear() { 
+			this->_removeData(this->begin(), this->end());
+			this->_alloc.deallocate(this->_data, this->_capacity);
+			this->_reassignVector(NULL, 0, 0);
+		}
 
 	public:
 		vector(const allocator_type& alloc = allocator_type()) 
@@ -207,11 +218,11 @@ namespace ft {
 		};
 
 		~vector() {
-			this->clear();
+			this->_fullClear();
 		};
 
 		vector			&operator=(const vector& other) {
-			this->clear();
+			this->_fullClear();
 			this->_size = other.size();
 			this->_capacity = other.capacity();
 			this->_alloc = other.get_allocator();
@@ -219,14 +230,12 @@ namespace ft {
 			return *this;
 		};
 
-		reference operator[](size_type n) {
-			this->_checkRangeOverflow(n);
-			return *(this->_data + n);
+		reference operator[](size_type const &n) {
+			return (this->_data)[n];
 		};
 
-		const_reference operator[](size_type n) const { 
-			this->_checkRangeOverflow(n);
-			return (const_cast<const_reference>(*(this->_data + n)));
+		const_reference operator[](size_type const &n) const { 
+			return (this->_data)[n];
 		};
 
 		iterator		begin() { return iterator(this->_data); };
@@ -240,8 +249,7 @@ namespace ft {
 		
 		void			clear() {
 			this->_removeData(this->begin(), this->end());
-			this->_alloc.deallocate(this->_data, this->_capacity);
-			this->_reassignVector(NULL, 0, 0);
+			this->_size = 0;
 		};
 
 		bool			empty() const { return (this->_size == 0); };
@@ -255,16 +263,13 @@ namespace ft {
 		void			resize (size_type n, value_type val = value_type()) {
 			if (n == this->_size)
 				return;
-			else if (n < this->_size) {
+			if (n > this->_capacity)
+				this->_capacity == 0 ? this->_reAlloc(n) : this->_reAlloc(this->_capacity * 2);
+			if (n < this->_size) 
 				this->_removeData(this->begin() + n, this->end());
-				this->_size -= (this->_size - n);
-			} else {
-				iterator temp = this->end();
-				size_type diff = n - this->_size;
-				this->_reAlloc(this->_newCapacity(n));
-				this->_size = n;
-				this->_fillData(temp, temp + diff, val);
-			}
+			else 
+				this->_fillData(this->begin() + n, this->end() + n, val);
+			this->_size = n;
 		};
 
 		reference		at (size_type n) { 
@@ -278,44 +283,38 @@ namespace ft {
 		};
 
 		reference		back () { 
-			this->_throwIfEmpty();
 			return *(this->_data + this->_size - 1);
 		};
 
 		const_reference	back () const { 
-			this->_throwIfEmpty();
 			return *(this->_data + this->_size - 1);
 		};
 
 		reference		front () { 
-			this->_throwIfEmpty();
 			return *(this->_data);
 		};
 
 		const_reference	front () const { 
-			this->_throwIfEmpty();
 			return *(this->_data);
 		};
 
 		void			push_back (const value_type& val) {
-			if (this->_size < this->_capacity) 
-				this->_data[this->_size] = val;
-			else {
-				this->_reAlloc(this->_newCapacity(this->_size + 1));
-				this->_data[this->_size] = val;
+			if (this->_size == this->_capacity) {
+				size_type newCapacity = this->_size ? this->_size * 2 : 2;
+				this->_reAlloc(newCapacity);
 			}
+			this->_alloc.construct(this->_data + this->_size, val);
 			this->_size++;
 		};
 
 		void			pop_back() {
-			this->_throwIfEmpty();
-			this->_removeData(this->end() - 1, this->end());
+			this->_alloc.destroy(this->_data + this->_size);
 			this->_size--;
 		};
 
 		void			reserve (size_type n) {
-			if (n <= this->max_size() &&  n > this->_capacity)
-				this->_reAlloc(n);
+			if (n <= this->_capacity) { return; }
+			this->_reAlloc(n);
 		};
 
 		iterator		erase (iterator first, iterator last) {
@@ -343,7 +342,7 @@ namespace ft {
 				throw std::range_error("Error: Wrong iterators range!");
 			size_type dst = static_cast<size_type>(sdst);
 			if (dst >= this->_capacity) {
-				this->clear();
+				this->_fullClear();
 				this->_capacity = dst;
 				this->_data = this->_alloc.allocate(dst);
 			} else
@@ -354,7 +353,7 @@ namespace ft {
 
 		void			assign (size_type n, const value_type& val) {
 			if (n > this->_capacity) {
-				this->clear();
+				this->_fullClear();
 				this->_capacity = n;
 				this->_data = this->_alloc.allocate(n);
 			} else
@@ -373,7 +372,7 @@ namespace ft {
 				tempIter += std::distance(this->begin(), position);
 				this->_fillData(tempIter, tempIter + n, val);
 				std::copy(position, this->end(), tempIter + n);
-				this->clear();
+				this->_fullClear();
 				this->_reassignVector(temp, newCapacity, newSize);
 			} else {
 				iterator oldEnd = this->end();
@@ -405,7 +404,7 @@ namespace ft {
 				tempIter += std::distance(this->begin(), position);
 				std::copy(first, last, tempIter);
 				std::copy(position, this->end(), tempIter + dst);
-				this->clear();
+				this->_fullClear();
 				this->_reassignVector(temp, newCapacity, newSize);
 			} else {
 				iterator oldEnd = this->end();

@@ -50,12 +50,12 @@ namespace ft {
 		reverse_iterator	operator+(difference_type n) const { return reverse_iterator(this->_base - n); };
 		reverse_iterator	operator-(difference_type n) const { return reverse_iterator(this->_base + n); };
 
-		reverse_iterator	&operator+=(difference_type n) const {
+		reverse_iterator	&operator+=(difference_type n) {
 			this->_base -= n;
 			return *this;
 		};
 
-		reverse_iterator	&operator-=(difference_type n) const { 
+		reverse_iterator	&operator-=(difference_type n) { 
 			this->_base += n;
 			return *this;
 		};

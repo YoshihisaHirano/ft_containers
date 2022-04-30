@@ -1,6 +1,5 @@
 #ifndef __FT_PAIR_H__
 #define __FT_PAIR_H__
-#include <iostream>
 
 namespace ft {
 	template <typename T1, typename T2>
@@ -58,12 +57,6 @@ namespace ft {
 	template <class T1, class T2>
 	pair<T1,T2> make_pair(T1 x, T2 y) {
 		return pair<T1,T2>(x, y);
-	};
-
-	template <class T1, class T2> // to delete
-	std::ostream &operator<<(std::ostream &o, const pair<T1,T2> &mypair) {
-		o << mypair.first << " " << mypair.second;
-		return o;
 	};
 }
 

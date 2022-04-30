@@ -6,6 +6,18 @@
 #include "is_integral.hpp"
 #include "pair.hpp"
 #include "equal.hpp"
+// struct s_time_res	t_res;
+
+// time_t timer();
+// void print_res(std::string test, std::vector<int> &s,
+// 		std::vector<int> &u, struct s_time_res &res);
+// void print_header();
+
+// void stack_test(void);
+// void pair_test(void);
+// void map_test(void);
+
+void vector_test(void);
 
 bool mypredicate (int i, int j) {
 	return (i==j);
@@ -240,5 +252,21 @@ int main()
 			std::cout << " " << bar[i];
 		std::cout << std::endl;
 	}
+	// try {
+	// 	vector_test();
+	// } catch (const std::exception& e) {
+	// 	std::cout << e.what() << std::endl;
+	// }
+
+	vector_test();
+	// {
+	// 	std::vector<int> vecta;
+	// 	// ft::vector<int> vectb;
+
+	// 	std::cout << "std: " << vecta[0] << std::endl;
+	// 	std::cout << "std: " << vecta.front() << std::endl;
+	// 	std::cout << "std: " << vecta.back() << std::endl;
+	// 	std::cout << "std: " << vecta.at(3) << std::endl;
+	// }
 	return 0;
 }

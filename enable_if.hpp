@@ -2,7 +2,7 @@
 #define __ENABLE_IF_H__
 
 namespace ft {
-	template <bool Cond, typename T>
+	template <bool Cond, typename T = void>
 	struct enable_if {};
 	
 	template <typename T>

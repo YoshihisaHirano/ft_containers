@@ -23,22 +23,22 @@ namespace ft {
 		void				push(const value_type& val) { return c.push_back(val); };
 		void				pop() { return c.pop_back(); };
 
-		template <class T, class Container>
+		template <T, Container>
 		friend bool operator==(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
 
-		template <class T, class Container>
+		template <T, Container>
 		friend bool operator!=(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
 
-		template <class T, class Container>
+		template <T, Container>
 		friend bool operator<(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
 
-		template <class T, class Container>
+		template <T, Container>
 		friend bool operator<=(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
 
-		template <class T, class Container>
+		template <T, Container>
 		friend bool operator>(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
 
-		template <class T, class Container>
+		template <T, Container>
 		friend bool operator>=(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
 	};
 
