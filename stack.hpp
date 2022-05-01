@@ -23,23 +23,23 @@ namespace ft {
 		void				push(const value_type& val) { return c.push_back(val); };
 		void				pop() { return c.pop_back(); };
 
-		template <T, Container>
-		friend bool operator==(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
+		template <class U, class Insides>
+		friend bool operator==(const stack<U,Insides>& lhs, const stack<U,Insides>& rhs);
 
-		template <T, Container>
-		friend bool operator!=(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
+		template <class U, class Insides>
+		friend bool operator!=(const stack<U,Insides>& lhs, const stack<U,Insides>& rhs);
 
-		template <T, Container>
-		friend bool operator<(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
+		template <class U, class Insides>
+		friend bool operator<(const stack<U,Insides>& lhs, const stack<U,Insides>& rhs);
 
-		template <T, Container>
-		friend bool operator<=(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
+		template <class U, class Insides>
+		friend bool operator<=(const stack<U,Insides>& lhs, const stack<U,Insides>& rhs);
 
-		template <T, Container>
-		friend bool operator>(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
+		template <class U, class Insides>
+		friend bool operator>(const stack<U,Insides>& lhs, const stack<U,Insides>& rhs);
 
-		template <T, Container>
-		friend bool operator>=(const stack<T,Container>& lhs, const stack<T,Container>& rhs);
+		template <class U, class Insides>
+		friend bool operator>=(const stack<U,Insides>& lhs, const stack<U,Insides>& rhs);
 	};
 
 	template <class T, class Container>

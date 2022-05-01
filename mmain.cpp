@@ -18,20 +18,20 @@ int main()
 	std::cout << "mymap size: " << mymap.size() << std::endl;
 	ft::map<int, char>::iterator it = mymap.begin();
 	it++;
-	std::cout << "mymap begin + 1: " << *it << std::endl;
+	std::cout << "mymap begin + 1: " << (*it).first << " " << (*it).second << std::endl;
 	ft::map<int, char>::iterator ite = mymap.end();
 	ite--;
-	std::cout << "mymap end - 1: " << *ite << std::endl;
+	std::cout << "mymap end - 1: " << (*ite).first << " " << (*ite).second << std::endl;
 	ite--;
-	std::cout << "mymap end - 2: " << *ite << std::endl;
+	std::cout << "mymap end - 2: " << (*ite).first << " " << (*ite).second << std::endl;
 	ite--;
-	std::cout << "mymap end - 3: " << *ite << std::endl;
+	std::cout << "mymap end - 3: " << (*ite).first << " " << (*ite).second << std::endl;
 	ft::map<int, char>::reverse_iterator rit = mymap.rend();
 	rit--;
-	std::cout << "mymap rend - 1: " << *rit << std::endl;
+	std::cout << "mymap rend - 1: " << (*rit).first << " " << (*rit).second << std::endl;
 	ft::map<int, char>::reverse_iterator rite = mymap.rbegin();
 	// rite++;
-	std::cout << "mymap rbegin + 1: " << *rite << std::endl;
+	std::cout << "mymap rbegin + 1: " << (*rite).first << " " << (*rite).second << std::endl;
 	std::cout << "mymap count 11: " << mymap.count(11) << std::endl;
 	std::cout << "mymap count 12: " << mymap.count(12) << std::endl;
 

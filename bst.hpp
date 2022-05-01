@@ -117,7 +117,7 @@ namespace ft {
 	};
 		public:
 		typedef bst_iterator	iterator;
-		typedef const iterator	const_iterator;
+		typedef iterator		const_iterator; // TODO: fix :)
 
 		protected:
 		node			*root;

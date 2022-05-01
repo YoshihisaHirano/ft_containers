@@ -82,36 +82,46 @@ namespace ft {
 			return (this->ptr - other.ptr);
 		}
 
+		operator vectorIterator<const T>() const {
+			return vectorIterator<const T>(this->ptr);
+		}
+
 		pointer	getPointer() const { return this->ptr; }
 	};
 
-	template <typename T>
-	bool operator==(const vectorIterator<T>& lhs, const vectorIterator<T>& rhs) {
+	template <typename T1, typename T2>
+	bool operator==(const vectorIterator<T1>& lhs, const vectorIterator<T2>&
+	        rhs) {
 		return (rhs.getPointer() == lhs.getPointer());
 	};
 
-	template <typename T>
-	bool operator!=(const vectorIterator<T>& lhs, const vectorIterator<T>& rhs) {
+	template <typename T1, typename T2>
+	bool operator!=(const vectorIterator<T1>& lhs, const vectorIterator<T2>&
+	rhs) {
 		return !(rhs == lhs);
 	};
 
-	template <typename T>
-	bool operator<(const vectorIterator<T>& lhs, const vectorIterator<T>& rhs) {
+	template <typename T1, typename T2>
+	bool operator<(const vectorIterator<T1>& lhs, const vectorIterator<T2>&
+	rhs) {
 		return (lhs.getPointer() < rhs.getPointer());
 	};
 
-	template <typename T>
-	bool operator>(const vectorIterator<T>& lhs, const vectorIterator<T>& rhs) {
+	template <typename T1, typename T2>
+	bool operator>(const vectorIterator<T1>& lhs, const vectorIterator<T2>&
+	rhs) {
 		return (rhs < lhs);
 	};
 
-	template <typename T>
-	bool operator>=(const vectorIterator<T>& lhs, const vectorIterator<T>& rhs) {
+	template <typename T1, typename T2>
+	bool operator>=(const vectorIterator<T1>& lhs, const vectorIterator<T2>&
+	rhs) {
 		return !(lhs < rhs);
 	};
 
-	template <typename T>
-	bool operator<=(const vectorIterator<T>& lhs, const vectorIterator<T>& rhs) {
+	template <typename T1, typename T2>
+	bool operator<=(const vectorIterator<T1>& lhs, const vectorIterator<T2>&
+	rhs) {
 		return !(lhs > rhs);
 	};
 
@@ -126,9 +136,9 @@ namespace ft {
 		typedef	typename allocator_type::pointer			pointer;
 		typedef typename allocator_type::const_pointer		const_pointer;
 		typedef	vectorIterator<T>							iterator;
-		typedef const vectorIterator<T>						const_iterator;
-		typedef const reverse_iterator<vectorIterator<T> >	const_reverse_iterator;
-		typedef reverse_iterator<vectorIterator<T> >		reverse_iterator;
+		typedef vectorIterator<const T>						const_iterator;
+		typedef reverse_iterator<const_iterator>			const_reverse_iterator;
+		typedef reverse_iterator<iterator>					reverse_iterator;
 		typedef	unsigned long								size_type;
 		typedef	ptrdiff_t									difference_type;
 
@@ -148,7 +158,10 @@ namespace ft {
 				this->_alloc.construct(it.getPointer(), val);
 		};
 
-		size_type	_newCapacity(size_type currSize) { return (static_cast<int>(currSize * 2)); };
+		size_type	_newCapacity(size_type currSize) {
+			if (this->_size == 0) return currSize;
+			return (static_cast<int>(currSize * 2));
+		};
 
 		void		_reassignVector(pointer newData, size_type newCapacity, size_type newSize)
 		{
@@ -159,8 +172,12 @@ namespace ft {
 
 		void		_reAlloc(size_type newCapacity) {
 			pointer tempAllloc = this->_alloc.allocate(newCapacity);
-			if (this->_size > 0) {
+			if (this->_size > 0)
 				std::copy(this->begin(), this->end(), iterator(tempAllloc));
+			else {
+				for (size_type i = 0; i < newCapacity; i++) {
+					*(tempAllloc + i) = value_type();
+				}
 			}
 			this->_removeData(this->begin(), this->end());
 			if (this->_data) {
@@ -170,7 +187,7 @@ namespace ft {
 			this->_reassignVector(tempAllloc, newCapacity, this->_size);
 		};
 
-		void		_checkRangeOverflow(size_type n) { 
+		void		_checkRangeOverflow(size_type n) const {
 			if (n >= this->_size)
 				throw std::out_of_range("Error: Out of range!");
 		};
@@ -195,12 +212,13 @@ namespace ft {
 				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL)
 		: _alloc(alloc) {
 			difference_type	sizeWannabe = std::distance(first, last);
+			std::cout << "dst: " << sizeWannabe << std::endl;
 			if (sizeWannabe < 0) { 
 				throw std::range_error("Error: Wrong iterators range!"); 
 			}
 			size_type newSize = static_cast<size_type>(sizeWannabe);
-			size_type newCapacity = this->_newCapacity(newSize);
-			this->_data = this->_alloc.allocate(newCapacity);
+			this->_data = this->_alloc.allocate(newSize);
+			this->_reassignVector(this->_data, newSize, newSize);
 			std::copy(first, last, this->begin());
 		};
 
@@ -239,9 +257,9 @@ namespace ft {
 		};
 
 		iterator		begin() { return iterator(this->_data); };
-		const_iterator	begin() const { return iterator(this->_data); };
+		const_iterator	begin() const { return const_iterator(this->_data); };
 		iterator		end() { return iterator(this->_data + this->_size); };
-		const_iterator	end() const { return iterator(this->_data + this->_size); };
+		const_iterator	end() const { return const_iterator(this->_data + this->_size); };
 		reverse_iterator	rbegin() { return reverse_iterator(this->end()); };
 		const_reverse_iterator	rbegin() const { return const_reverse_iterator(this->end()); };
 		reverse_iterator	rend() { return reverse_iterator(this->begin()); };
@@ -268,7 +286,7 @@ namespace ft {
 			if (n < this->_size) 
 				this->_removeData(this->begin() + n, this->end());
 			else 
-				this->_fillData(this->begin() + n, this->end() + n, val);
+				this->_fillData(this->begin() + this->_size, this->end() + this->_size, val);
 			this->_size = n;
 		};
 
@@ -436,8 +454,8 @@ namespace ft {
 		if (lhs.size() != rhs.size()) {
 			return false;
 		}
-		typename vector<T,Alloc>::iterator it1 = lhs.begin();
-		typename vector<T,Alloc>::iterator it2 = rhs.begin();
+		typename vector<T,Alloc>::const_iterator it1 = lhs.begin();
+		typename vector<T,Alloc>::const_iterator it2 = rhs.begin();
 		for (; it1 != lhs.end(); ++it1, ++it2) {
 			if (*it1 != *it2) { return false; }
 		}
@@ -451,10 +469,10 @@ namespace ft {
 	
 	template <class T, class Alloc>
 	bool operator<(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
-		typename vector<T,Alloc>::iterator first1 = lhs.begin();
-		typename vector<T,Alloc>::iterator first2 = rhs.begin();
-		typename vector<T,Alloc>::iterator last1 = lhs.end();
-		typename vector<T,Alloc>::iterator last2 = rhs.end();
+		typename vector<T,Alloc>::const_iterator first1 = lhs.begin();
+		typename vector<T,Alloc>::const_iterator first2 = rhs.begin();
+		typename vector<T,Alloc>::const_iterator last1 = lhs.end();
+		typename vector<T,Alloc>::const_iterator last2 = rhs.end();
 
 		for (; first1 != last1; ++first1, ++first2) { 
 			if (first2 == last2 || *first1 > *first2) { return false; }

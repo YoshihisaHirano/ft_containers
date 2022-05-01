@@ -2,7 +2,7 @@
 #define __FT_MAP_H__
 #include <memory>
 #include <functional>
-#include "pair.hpp"
+#include "utility.hpp"
 #include "iterator.hpp"
 #include "bst.hpp"
 
@@ -40,7 +40,7 @@ namespace ft {
 		typedef typename allocator_type::const_pointer				const_pointer;
 		typedef typename bs_tree<value_type, value_compare>::iterator				iterator;
 		typedef typename bs_tree<value_type, value_compare>::const_iterator		const_iterator;
-		typedef const reverse_iterator<iterator>					const_reverse_iterator;
+		typedef reverse_iterator<const_iterator>					const_reverse_iterator;
 		typedef reverse_iterator<iterator >							reverse_iterator;
 		typedef	unsigned long										size_type;
 		typedef	ptrdiff_t											difference_type;
@@ -78,7 +78,12 @@ namespace ft {
 		};
 
 		mapped_type& operator[] (const key_type& k) {
-			return (*((this->insert(make_pair(k,mapped_type()))).first)).second;
+			this->_size++;
+			iterator it_find = this->find(k);
+			if (it_find != this->end()) { return (*it_find).second; }
+			ft::pair<key_type, mapped_type> newPair(k, mapped_type());
+			iterator it_ins = this->_data.insert(newPair);
+			return (*it_ins).second;
 		};
 
 		iterator		begin() { return this->_data.begin(); };
@@ -95,6 +100,14 @@ namespace ft {
 		value_compare	value_comp() const { return value_compare(key_compare()); };
 		size_type		max_size() const { return this->_data.max_size(); };
 		size_type		size() const { return this->_size; };
+
+		mapped_type& at (const key_type& k) {
+			return (*this)[k];
+		};
+
+		const mapped_type& at (const key_type& k) const {
+			return (*this)[k];
+		};
 
 		void			clear() { 
 			this->_size = 0;
