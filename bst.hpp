@@ -17,9 +17,15 @@ namespace ft {
 		node		left;
 		node		right;
 		node		parent;
+		bool		red;
 
 		bst_node(T value, node lt = NULL, node rt = NULL, node pt = NULL)
 		: value(value), left(lt), right(rt), parent(pt) {};
+
+		node *uncle(node *x) {
+			if (x->parent == NULL) return NULL;
+
+		};
 	};
 
 	template <typename T, class Compare = std::less<T> >
@@ -130,7 +136,7 @@ namespace ft {
 		typedef bst_iterator<false>	iterator;
 		typedef bst_iterator<true>	const_iterator;
 
-		protected:
+		private:
 		node			*root;
 		Compare			comp;
 
@@ -198,6 +204,40 @@ namespace ft {
 				delete subtreeRoot;
 			}
 			subtreeRoot = NULL;
+		};
+
+		void	_leftRotate(node *x) {
+			if (x->right == NULL) return;
+			node *y = x->right;
+			x->right = y->left;
+			if (y->left != NULL)
+				y->left->parent = x;
+			y->parent = x->parent;
+			if (x->parent == NULL)
+				this->root = y;
+			else if (x == x->parent->left)
+				x->parent->left = y;
+			else
+				x->parent->right = y;
+			y->left = x;
+			x->parent = y;
+		};
+
+		void	_rightRotate(node *x) {
+			if (x->left == NULL) return;
+			node *y = x->left;
+			x->left = y->right;
+			if (y->right != NULL)
+				y->right->parent = x;
+			y->parent = x->parent;
+			if (x->parent == NULL)
+				this->root = y;
+			else if (x == x->parent->left)
+				x->parent->left = y;
+			else
+				x->parent->right = y;
+			y->right = x;
+			x->parent = y;
 		};
 
 		public:
