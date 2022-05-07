@@ -130,7 +130,7 @@ namespace ft {
 			return (this->find(k) == this->_data.end()) ? 0 : 1;
 		};
 
-		pair<iterator,bool>	insert(const value_type& val) { 
+		pair<iterator,bool> insert(const value_type& val) {
 			iterator it = this->_data.insert(val);
 			if (it == this->end())
 				return pair<iterator,bool>(it, false);
@@ -184,7 +184,6 @@ namespace ft {
 
 		size_type		erase (const key_type& k) {
 			iterator it = this->find(k);
-			std::cout << "key: " << k << std::endl;
 			if (it == this->end())
 				return 0;
 			this->_data.remove(*it);
