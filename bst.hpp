@@ -27,6 +27,7 @@ namespace ft {
 		typedef bst_node<T>			node;
 		typedef bs_tree<T, Compare>	tree;
 
+		template <bool isConst>
 		class bst_iterator : public std::iterator<std::bidirectional_iterator_tag, T> {
 		private:
 
@@ -34,13 +35,19 @@ namespace ft {
 		const tree	*tree;
 
 		public:
-		typedef typename std::iterator<std::bidirectional_iterator_tag, T>::reference reference;
-		typedef typename std::iterator<std::bidirectional_iterator_tag, T>::pointer   pointer;
+		typedef typename ft::conditional<isConst, const T&, T&>::type	reference;
+		typedef typename ft::conditional<isConst, const T*, T*>::type   pointer;
+		
 
 		bst_iterator() : position(NULL), tree(NULL) {};
 		bst_iterator(const bst_iterator& other) : position(other.position), tree(other.tree) {};
 		bst_iterator(bst_node<T> *pos, const bs_tree<T, Compare> *tr) : position(pos), tree(tr) {};
 		~bst_iterator() {};
+		template <bool B>
+		bst_iterator(const bst_iterator<B> & x, typename ft::enable_if<!B>::type* = 0){
+			this->position = x.getPos();
+			this->tree = x.getTree();
+		};
 
 		bst_iterator	&operator=(const bst_iterator& other) {
 			this->position = other.position;
@@ -48,8 +55,11 @@ namespace ft {
 			return *this;
 		};
 
-		const reference		operator*() const { return this->position->value; };
-		const pointer		operator->() const { return &(this->position->value); };
+		const bs_tree<T, Compare> *getTree() const { return this->tree; }
+		node	*getPos() const { return this->position; }
+
+		reference			operator*() { return this->position->value; };
+		pointer				operator->() { return &(this->position->value); };
 
 		bst_iterator		&operator++() {
 			if (this->tree->empty()) {
@@ -116,8 +126,8 @@ namespace ft {
 		};
 	};
 		public:
-		typedef bst_iterator	iterator;
-		typedef iterator		const_iterator; // TODO: fix :)
+		typedef bst_iterator<false>	iterator;
+		typedef bst_iterator<true>	const_iterator;
 
 		protected:
 		node			*root;
@@ -252,9 +262,15 @@ namespace ft {
 		iterator	begin() const { 
 			return iterator(this->findMin(this->root), this);
 		};
+		const_iterator	cbegin() const {
+			return const_iterator(this->findMin(this->root), this);
+		};
 
 		iterator	end() const { 
 			return iterator(NULL, this);
+		};
+		const_iterator	cend() const {
+			return const_iterator(NULL, this);
 		};
 
 		size_t		max_size() const { return std::allocator<bst_node<T> >().max_size(); }

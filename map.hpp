@@ -41,7 +41,7 @@ namespace ft {
 		typedef typename bs_tree<value_type, value_compare>::iterator				iterator;
 		typedef typename bs_tree<value_type, value_compare>::const_iterator		const_iterator;
 		typedef reverse_iterator<const_iterator>					const_reverse_iterator;
-		typedef reverse_iterator<iterator >							reverse_iterator;
+		typedef reverse_iterator<iterator>							reverse_iterator;
 		typedef	unsigned long										size_type;
 		typedef	ptrdiff_t											difference_type;
 
@@ -87,13 +87,13 @@ namespace ft {
 		};
 
 		iterator		begin() { return this->_data.begin(); };
-		const_iterator	begin() const { return this->_data.begin(); };
+		const_iterator	begin() const { return this->_data.cbegin(); };
 		reverse_iterator rbegin() { return reverse_iterator(this->end()); };
-		const_reverse_iterator rbegin() const { return reverse_iterator(this->end()); }; 
+		const_reverse_iterator rbegin() const { return const_reverse_iterator(this->_data.cend()); };
 		reverse_iterator rend() { return reverse_iterator(this->begin()); };
-		const_reverse_iterator rend() const { return reverse_iterator(this->begin()); };;
+		const_reverse_iterator rend() const { return const_reverse_iterator(this->_data.cbegin()); };;
 		iterator		end() { return this->_data.end(); };
-		const_iterator	end() const { return this->_data.end(); };
+		const_iterator	end() const { return this->_data.cend(); };
 		bool			empty() const { return this->_size == 0; };
 		allocator_type	get_allocator() const { return allocator_type(); };
 		key_compare		key_comp() const { return key_compare(); };
@@ -232,8 +232,8 @@ namespace ft {
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator==(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
 		if (lhs.size() != rhs.size()) { return false; }
-		typename map<Key,T,Compare,Alloc>::iterator itl = lhs.begin();
-		typename map<Key,T,Compare,Alloc>::iterator itr = rhs.begin();
+		typename map<Key,T,Compare,Alloc>::const_iterator itl = lhs.begin();
+		typename map<Key,T,Compare,Alloc>::const_iterator itr = rhs.begin();
 		for (; itl != lhs.end(); ++itl, ++itr) {
 			if (*itl != *itr) { return false; }
 		}
@@ -247,10 +247,10 @@ namespace ft {
 
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator<(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
-		typename map<Key,T,Compare,Alloc>::iterator first1 = lhs.begin();
-		typename map<Key,T,Compare,Alloc>::iterator first2 = rhs.begin();
-		typename map<Key,T,Compare,Alloc>::iterator last1 = lhs.end();
-		typename map<Key,T,Compare,Alloc>::iterator last2 = rhs.end();
+		typename map<Key,T,Compare,Alloc>::const_iterator first1 = lhs.begin();
+		typename map<Key,T,Compare,Alloc>::const_iterator first2 = rhs.begin();
+		typename map<Key,T,Compare,Alloc>::const_iterator last1 = lhs.end();
+		typename map<Key,T,Compare,Alloc>::const_iterator last2 = rhs.end();
 		for (; first1 != last1; first1++, first2++) {
 			if (first2 == last2 || (*first2 < *first1)) { return false; }
 			else if (*first1 < *first2) { return true; }
