@@ -19,13 +19,22 @@ namespace ft {
 		node		parent;
 		bool		red;
 
-		bst_node(T value, node lt = NULL, node rt = NULL, node pt = NULL)
-		: value(value), left(lt), right(rt), parent(pt) {};
+		bst_node(T value, node lt = NULL, node rt = NULL, node pt = NULL, bool red = true)
+		: value(value), left(lt), right(rt), parent(pt), red(red) {};
 
-		node *uncle(node *x) {
+		node	*uncle(node *x) {
 			if (x->parent == NULL) return NULL;
-
+			if (x == x->parent->left) return x->parent->right;
+			return x->parent->left;
 		};
+
+		node	*grandparent(node *x) {
+			if (x->parent == NULL) return NULL;
+			return x->parent->parent;
+		}
+
+		void	colorRed(node *x) { x->red = true; }
+		void	colorBlack(node *x) { x->red = false; }
 	};
 
 	template <typename T, class Compare = std::less<T> >
@@ -239,6 +248,40 @@ namespace ft {
 			y->right = x;
 			x->parent = y;
 		};
+
+		void	_swap_color(node *x, node *y) {
+			bool	tmp_red = x->red;
+
+			x->red = y->red;
+			y->red = tmp_red;
+		};
+
+		void	_rotate(node *y) {
+			node	*x;
+			node	*y_parent;
+			
+
+			if (y == NULL) return;
+			y_parent = y->parent;
+			if (y->left == NULL)
+				x = y->right;
+			else
+				x = y->left;
+			if (x == NULL) return;
+			if (y->parent->left == y && y->left == x) {
+				this->_rightRotate(y_parent);
+			} else if (y->parent->left == y && y->right == x) {
+				this->_leftRotate(y);
+				this->_rightRotate(y_parent);
+			} else if (y->parent->right == y && y->right == x) {
+				this->_leftRotate(y_parent);
+			} else {
+				this->_rightRotate(y);
+				this->_leftRotate(y_parent);
+			}
+			this->_swap_color(y_parent, y);
+		};
+
 
 		public:
 		bs_tree(const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {};
