@@ -22,19 +22,19 @@ namespace ft {
 		bst_node(T value, node lt = NULL, node rt = NULL, node pt = NULL, bool red = true)
 		: value(value), left(lt), right(rt), parent(pt), red(red) {};
 
-		node	*uncle(node *x) {
-			if (x->parent == NULL) return NULL;
-			if (x == x->parent->left) return x->parent->right;
-			return x->parent->left;
+		node	uncle() {
+			if (this->parent == NULL) return NULL;
+			if (this == this->parent->left) return this->parent->right;
+			return this->parent->left;
 		};
 
-		node	*grandparent(node *x) {
-			if (x->parent == NULL) return NULL;
-			return x->parent->parent;
+		node	grandparent() {
+			if (this->parent == NULL) return NULL;
+			return this->parent->parent;
 		}
 
-		void	colorRed(node *x) { x->red = true; }
-		void	colorBlack(node *x) { x->red = false; }
+		void	colorRed() { this->red = true; }
+		void	colorBlack() { this->red = false; }
 	};
 
 	template <typename T, class Compare = std::less<T> >
@@ -162,6 +162,12 @@ namespace ft {
 				return NULL;
 		};
 
+		node	*_insert_rb(const T &val, node * &subtreeRoot, node *parent) {
+			node *newNode = this->_insert(val, subtreeRoot, parent);
+			this->_ins_balance(newNode);
+			return newNode;
+		};
+
 		bool	_remove(const T &val, node * &subtreeRoot) {
 			if (subtreeRoot == NULL)
 				return false;
@@ -259,7 +265,6 @@ namespace ft {
 		void	_rotate(node *y) {
 			node	*x;
 			node	*y_parent;
-			
 
 			if (y == NULL) return;
 			y_parent = y->parent;
@@ -267,7 +272,7 @@ namespace ft {
 				x = y->right;
 			else
 				x = y->left;
-			if (x == NULL) return;
+			if (x == NULL || y_parent == NULL) return;
 			if (y->parent->left == y && y->left == x) {
 				this->_rightRotate(y_parent);
 			} else if (y->parent->left == y && y->right == x) {
@@ -282,6 +287,26 @@ namespace ft {
 			this->_swap_color(y_parent, y);
 		};
 
+		void	_ins_balance(node *x) {
+			if (x == NULL) return;
+			if (x->parent == NULL) {
+				x->colorBlack();
+				return;
+			}
+			node *uncle = x->uncle();
+			if (uncle && uncle->red) {
+				x->parent->colorBlack();
+				uncle->colorBlack();
+				node *grandparent = x->grandparent();
+				if (grandparent == NULL)
+					return;
+				grandparent->colorRed();
+				this->_ins_balance(x->grandparent());
+			} else {
+				this->_rotate(x->parent);
+				this->_ins_balance(x->parent);
+			}
+		};
 
 		public:
 		bs_tree(const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {};
@@ -334,7 +359,7 @@ namespace ft {
 		};
 
 		iterator	insert(const T &val) { 
-			node *res = this->_insert(val, this->root, NULL);
+			node *res = this->_insert_rb(val, this->root, NULL);
 			if (!res) { return this->end(); }
 			return iterator(res, this);
 		};

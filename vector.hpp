@@ -174,11 +174,11 @@ namespace ft {
 			pointer tempAllloc = this->_alloc.allocate(newCapacity);
 			if (this->_size > 0)
 				std::copy(this->begin(), this->end(), iterator(tempAllloc));
-			else {
-				for (size_type i = 0; i < newCapacity; i++) {
-					*(tempAllloc + i) = value_type();
-				}
-			}
+//			else {
+//				for (size_type i = 0; i < newCapacity; i++) {
+//					*(tempAllloc + i) = value_type();
+//				}
+//			}
 			this->_removeData(this->begin(), this->end());
 			if (this->_data) {
 				this->_alloc.deallocate(this->_data, this->_capacity);
@@ -201,6 +201,19 @@ namespace ft {
 			this->_removeData(this->begin(), this->end());
 			this->_alloc.deallocate(this->_data, this->_capacity);
 			this->_reassignVector(NULL, 0, 0);
+		}
+
+		template<class Iterator>
+		bool	_validate_insert_size(Iterator first, Iterator last, size_t range) {
+			pointer tmp_buf = this->_alloc.allocate(range);
+			bool res = true;
+			size_t i = 0;
+			for (;first != last; ++first, ++i) {
+				try { tmp_buf[i] = *first; }
+				catch (...) { res = false; break; }
+			}
+			_alloc.deallocate(tmp_buf, range);
+			return res;
 		}
 
 	public:
@@ -286,7 +299,7 @@ namespace ft {
 			if (n < this->_size) 
 				this->_removeData(this->begin() + n, this->end());
 			else 
-				this->_fillData(this->begin() + this->_size, this->end() + this->_size, val);
+				this->_fillData(this->begin() + this->_size, this->end() + (n - this->_size), val);
 			this->_size = n;
 		};
 
@@ -349,7 +362,12 @@ namespace ft {
 		};
 
 		iterator		erase (iterator position) {
-			return this->erase(position, position + 1);
+			this->_alloc.destroy(position.getPointer());
+			size_type idx = position - this->begin();
+			for (size_type i = idx; i < this->_size; i++)
+				this->_data[i] = this->_data[i+1];
+			this->_size--;
+			return position;
 		};
 
 		template <class InputIterator>
@@ -383,7 +401,7 @@ namespace ft {
 		void			insert(iterator position, size_type n, const value_type& val) {
 			if (n + this->_size > this->_capacity) {
 				size_type newSize = this->_size + n;
-				size_type newCapacity = this->_newCapacity(newSize);
+				size_type newCapacity = newSize;
 				pointer temp = this->_alloc.allocate(newCapacity);
 				iterator tempIter = iterator(temp);
 				std::copy(this->begin(), position, tempIter);
@@ -402,6 +420,8 @@ namespace ft {
 
 		iterator		insert(iterator position, const value_type& val) {
 			difference_type distanceFromBegin = std::distance(this->begin(), position);
+			if (this->_size == this->_capacity)
+				this->_capacity = this->_capacity == 0 ? 2 : this->_size * 2;
 			this->insert(position, 1, val);
 			return (this->begin() + distanceFromBegin);
 		};
@@ -413,9 +433,11 @@ namespace ft {
 			if (sdst < 0)
 				throw std::range_error("Error: Wrong iterators range!");
 			size_type dst = static_cast<size_type>(sdst);
+			if (!this->_validate_insert_size(first, last, dst))
+				throw std::exception();
 			if (this->_size + dst > this->_capacity) {
 				size_type newSize = this->_size + dst;
-				size_type newCapacity = this->_newCapacity(newSize);
+				size_type newCapacity = this->_size * 2 > newSize ? this->_size * 2 : newSize;
 				pointer temp = this->_alloc.allocate(newCapacity);
 				iterator tempIter = iterator(temp);
 				std::copy(this->begin(), position, tempIter);
@@ -496,8 +518,11 @@ namespace ft {
 		return !(lhs < rhs);
 	};
 
+}
+
+namespace std {
 	template <class T, class Alloc>
-	void swap (vector<T,Alloc>& x, vector<T,Alloc>& y) {
+	void swap (ft::vector<T,Alloc>& x, ft::vector<T,Alloc>& y) {
 		x.swap(y);
 	};
 }

@@ -310,39 +310,39 @@ int main()
 //			std::cout << it->first << " => " << it->second << '\n';
 //	}
 //
-//	{
-//		std::map<char,int> foo,bar;
-//		foo['a']=100;
-//		foo['b']=200;
-//		bar['a']=10;
-//		bar['z']=1000;
-//
-//		if (foo==bar) std::cout << "foo and bar are equal\n";
-//		if (foo!=bar) std::cout << "foo and bar are not equal\n";
-//		if (bar<foo) std::cout << "bar is less than foo\n";
-//		if (foo>bar) std::cout << "foo is greater than bar\n";
-//		if (bar<=foo) std::cout << "bar is less than or equal to foo\n";
-//		if (foo>=bar) std::cout << "foo is greater than or equal to bar\n";
-//	}
-//
-//	}
-	std::map<int, int> m;
-	m.insert(std::make_pair(1, 2));
-	m.insert(std::make_pair(2, 2));
-	m.insert(std::make_pair(3, 2));
-	m.insert(std::make_pair(4, 2));
-	const std::map<int, int> m2(m);
-	std::map<int, int>::const_iterator it = m2.begin();
-//	it->second = 42;
+	{
+		std::map<char,int> foo,bar;
+		foo['a']=100;
+		foo['b']=200;
+		bar['a']=10;
+		bar['z']=1000;
 
-	ft::map<int, int> m0;
-	m0.insert(ft::make_pair(1, 2));
-	m0.insert(ft::make_pair(2, 2));
-	m0.insert(ft::make_pair(3, 2));
-	m0.insert(ft::make_pair(4, 2));
-	const ft::map<int, int> m1(m0);
-	ft::map<int, int>::const_iterator it0 = m1.begin();
-	it0->second = 42;
+		if (foo==bar) std::cout << "foo and bar are equal\n";
+		if (foo!=bar) std::cout << "foo and bar are not equal\n";
+		if (bar<foo) std::cout << "bar is less than foo\n";
+		if (foo>bar) std::cout << "foo is greater than bar\n";
+		if (bar<=foo) std::cout << "bar is less than or equal to foo\n";
+		if (foo>=bar) std::cout << "foo is greater than or equal to bar\n";
+	}
+//
+//	}
+//	std::map<int, int> m;
+//	m.insert(std::make_pair(1, 2));
+//	m.insert(std::make_pair(2, 2));
+//	m.insert(std::make_pair(3, 2));
+//	m.insert(std::make_pair(4, 2));
+//	const std::map<int, int> m2(m);
+//	std::map<int, int>::const_iterator it = m2.begin();
+////	it->second = 42;
+//
+//	ft::map<int, int> m0;
+//	m0.insert(ft::make_pair(1, 2));
+//	m0.insert(ft::make_pair(2, 2));
+//	m0.insert(ft::make_pair(3, 2));
+//	m0.insert(ft::make_pair(4, 2));
+//	const ft::map<int, int> m1(m0);
+//	ft::map<int, int>::const_iterator it0 = m1.begin();
+//	it0->second = 42;
 //	m1[(*it0).first]
 
 	return 0;
