@@ -16,6 +16,11 @@ namespace ft {
 		public:
 		explicit stack(const container_type& ctnr = container_type()) : c(ctnr) {};
 
+		stack& operator=( const stack& other ) {
+			this->c = other.c;
+			return *this;
+		};
+
 		bool				empty() const { return c.empty(); };
 		size_type			size() const { return c.size(); };
 		value_type			&top() { return c.back(); };

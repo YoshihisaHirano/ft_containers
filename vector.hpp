@@ -254,10 +254,10 @@ namespace ft {
 
 		vector			&operator=(const vector& other) {
 			this->_fullClear();
-			this->_size = other.size();
-			this->_capacity = other.capacity();
 			this->_alloc = other.get_allocator();
 			this->assign(other.begin(), other.end());
+			this->_size = other.size();
+			this->_capacity = other.capacity();
 			return *this;
 		};
 
@@ -402,6 +402,8 @@ namespace ft {
 			if (n + this->_size > this->_capacity) {
 				size_type newSize = this->_size + n;
 				size_type newCapacity = newSize;
+				if (n == 1 && this->_size == this->_capacity)
+					newCapacity = this->_capacity == 0 ? 2 : this->_size * 2;
 				pointer temp = this->_alloc.allocate(newCapacity);
 				iterator tempIter = iterator(temp);
 				std::copy(this->begin(), position, tempIter);
@@ -410,7 +412,8 @@ namespace ft {
 				std::copy(position, this->end(), tempIter + n);
 				this->_fullClear();
 				this->_reassignVector(temp, newCapacity, newSize);
-			} else {
+			} 
+			else {
 				iterator oldEnd = this->end();
 				this->_size += n;
 				std::copy_backward(position, oldEnd, this->end());
@@ -420,8 +423,6 @@ namespace ft {
 
 		iterator		insert(iterator position, const value_type& val) {
 			difference_type distanceFromBegin = std::distance(this->begin(), position);
-			if (this->_size == this->_capacity)
-				this->_capacity = this->_capacity == 0 ? 2 : this->_size * 2;
 			this->insert(position, 1, val);
 			return (this->begin() + distanceFromBegin);
 		};
