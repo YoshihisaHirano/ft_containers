@@ -1,8 +1,48 @@
 #include "map.hpp"
 #include <iostream>
 #include <map>
+#include <vector>
+
+template <class T, class V>
+std::vector<int> clear_test(std::map<T, V> mp) {
+	std::vector<int> v;
+//	mp.clear();
+	for (int i = 0, j = 0; i < 25 * 10000; ++i, ++j)
+		mp.insert(std::make_pair(i, j));
+	v.push_back(mp.size());
+//	mp.clear();
+	v.push_back(mp.size());
+	typename std::map<T, V>::iterator it = mp.begin();
+	if (it == mp.end())
+		v.push_back(1);
+	return v;
+}
+
+template <class T, class V>
+std::vector<int> clear_test(ft::map<T, V> mp) {
+	std::vector<int> v;
+//	mp.clear();
+	for (int i = 0, j = 0; i < 25 * 6000; ++i, ++j)
+		mp.insert(ft::make_pair(i, j));
+	v.push_back(mp.size());
+//	mp.clear();
+	v.push_back(mp.size());
+	typename ft::map<T, V>::iterator it = mp.begin();
+	if (it == mp.end())
+		v.push_back(1);
+	std::cout << "HEEEERE" << std::endl;
+//	mp.data().print();
+	std::cout << "HEEEERE" << std::endl;
+	return v;
+}
+
+
 int main()
 {
+	{
+		ft::map<int, int> mm;
+		std::vector<int> mv = clear_test(mm);
+	}
 //	{
 //	ft::map<int, char> mymap;
 //	mymap.begin();
@@ -130,24 +170,24 @@ int main()
 //		std::cout << ret.second->first << " => " << ret.second->second << '\n';
 //	}
 //
-//	{
-//		ft::map<char,int> first;
-//
-//		first['a']=10;
-//		first['b']=30;
-//		first['c']=50;
-//		first['d']=70;
-//
-//		ft::map<char,int> second (first.begin(),first.end());
-//		std::cout << "second contains:\n";
-//		for (ft::map<char,int>::iterator it=second.begin(); it!=second.end(); ++it)
-//			std::cout << it->first << " => " << it->second << '\n';
-//		ft::map<char,int> third (second);
-//		std::cout << "third contains:\n";
-//		for (ft::map<char,int>::iterator it=third.begin(); it!=third.end(); ++it)
-//			std::cout << it->first << " => " << it->second << '\n';
-//		std::cout << "third size: " << third.size() << '\n';
-//	}
+	{
+		ft::map<char,int> first;
+
+		first['a']=10;
+		first['b']=30;
+		first['c']=50;
+		first['d']=70;
+
+		ft::map<char,int> second (first.begin(),first.end());
+		std::cout << "second contains:\n";
+		for (ft::map<char,int>::iterator it=second.begin(); it!=second.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+		ft::map<char,int> third (second);
+		std::cout << "third contains:\n";
+		for (ft::map<char,int>::iterator it=third.begin(); it!=third.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+		std::cout << "third size: " << third.size() << '\n';
+	}
 //
 //	{
 //		ft::map<char,int> foo,bar;
@@ -310,20 +350,20 @@ int main()
 //			std::cout << it->first << " => " << it->second << '\n';
 //	}
 //
-	{
-		std::map<char,int> foo,bar;
-		foo['a']=100;
-		foo['b']=200;
-		bar['a']=10;
-		bar['z']=1000;
-
-		if (foo==bar) std::cout << "foo and bar are equal\n";
-		if (foo!=bar) std::cout << "foo and bar are not equal\n";
-		if (bar<foo) std::cout << "bar is less than foo\n";
-		if (foo>bar) std::cout << "foo is greater than bar\n";
-		if (bar<=foo) std::cout << "bar is less than or equal to foo\n";
-		if (foo>=bar) std::cout << "foo is greater than or equal to bar\n";
-	}
+//	{
+//		std::map<char,int> foo,bar;
+//		foo['a']=100;
+//		foo['b']=200;
+//		bar['a']=10;
+//		bar['z']=1000;
+//
+//		if (foo==bar) std::cout << "foo and bar are equal\n";
+//		if (foo!=bar) std::cout << "foo and bar are not equal\n";
+//		if (bar<foo) std::cout << "bar is less than foo\n";
+//		if (foo>bar) std::cout << "foo is greater than bar\n";
+//		if (bar<=foo) std::cout << "bar is less than or equal to foo\n";
+//		if (foo>=bar) std::cout << "foo is greater than or equal to bar\n";
+//	}
 //
 //	}
 //	std::map<int, int> m;

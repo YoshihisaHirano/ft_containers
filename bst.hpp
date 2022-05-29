@@ -149,7 +149,7 @@ namespace ft {
 		node			*root;
 		Compare			comp;
 
-		node	*_insert(const T &val, node * &subtreeRoot, node *parent) {
+		node	*_insert(const T &val, node *subtreeRoot, node *parent) {
 			if (subtreeRoot == NULL) {
 				subtreeRoot = new node(val, NULL, NULL, parent);
 				return subtreeRoot;
@@ -162,9 +162,34 @@ namespace ft {
 				return NULL;
 		};
 
+		node	*insert_(const T &val) {
+			node *newNode = new node(val, NULL, NULL, NULL);
+			node *x = this->root;
+			node *y = NULL;
+			while (x != NULL) {
+				y = x;
+				if (comp(val, x->value))
+					x = x->left;
+				else
+					x = x->right;
+			}
+			newNode->parent = y;
+			if (newNode->parent == NULL) {
+				this->root = newNode;
+				return newNode;
+			}
+			if (comp(val, y->value))
+				y->left = newNode;
+			else
+				y->right = newNode;
+			return newNode;
+		};
+
 		node	*_insert_rb(const T &val, node * &subtreeRoot, node *parent) {
-			node *newNode = this->_insert(val, subtreeRoot, parent);
+			node *newNode = this->insert_(val);
 			this->_ins_balance(newNode);
+			if (newNode->value.first == 19001)
+				std:: cout << newNode->left << " " << newNode->right << std::endl;
 			return newNode;
 		};
 
@@ -201,23 +226,28 @@ namespace ft {
 				this->_clone(subtreeRoot->right), subtreeRoot->parent);
 		};
 
+	public:
 		void	_print(node *subtreeRoot) const {
 			if (subtreeRoot == NULL)
 			{
 				std::cout << std::endl;
 				return;
 			}
+			std::cout <<  "trying to access left of "  << subtreeRoot->value.first << std::endl;
 			this->_print(subtreeRoot->left);
-			std::cout << subtreeRoot->value << " " << std::endl;
+			std::cout << subtreeRoot->value.first << " "  << std::endl;
 			this->_print(subtreeRoot->right);
 		};
-
-		void	_clear(node * &subtreeRoot) {
-			if (subtreeRoot != NULL) {
-				this->_clear(subtreeRoot->left);
-				this->_clear(subtreeRoot->right);
-				delete subtreeRoot;
-			}
+		void print() {
+			this->_print(this->root);
+		};
+	private:
+		void	_clear(node *subtreeRoot) {
+			if (subtreeRoot == NULL)
+				return;
+			this->_clear(subtreeRoot->left);
+			this->_clear(subtreeRoot->right);
+			delete subtreeRoot;
 			subtreeRoot = NULL;
 		};
 
@@ -330,6 +360,7 @@ namespace ft {
 
 		void	clear() { 
 			this->_clear(this->root);
+			this->root = NULL;
 		};
 
 		node	*findMin(node *subtreeRoot) const {

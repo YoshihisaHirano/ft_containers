@@ -52,6 +52,9 @@ namespace ft {
 		allocator_type						_alloc;
 
 		public:
+
+		bs_tree<value_type, value_compare>& data() { return this->_data; }
+
 		map(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) 
 		: _data(NULL, value_compare(comp)), _size(0), _comp(comp), _alloc(alloc) {};
 
@@ -67,7 +70,7 @@ namespace ft {
 		};
 
 		~map() {
-			this->clear();
+//			this->clear();
 		};
 
 		map& operator=(const map& x) { 
