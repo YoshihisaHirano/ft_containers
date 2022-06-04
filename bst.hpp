@@ -324,17 +324,20 @@ namespace ft {
 				return;
 			}
 			node *uncle = x->uncle();
-			if (uncle && uncle->red) {
-				x->parent->colorBlack();
-				uncle->colorBlack();
-				node *grandparent = x->grandparent();
-				if (grandparent == NULL)
-					return;
-				grandparent->colorRed();
-				this->_ins_balance(x->grandparent());
-			} else {
-				this->_rotate(x->parent);
-				this->_ins_balance(x->parent);
+			if (x->value.first == 3)
+			if (x->parent->red) {
+				if (uncle && uncle->red) {
+					std::cout << x->value.first << " uncle: " << uncle->value.first << std::endl;
+					x->parent->colorBlack();
+					uncle->colorBlack();
+					node *grandparent = x->grandparent();
+					if (grandparent != NULL)
+						grandparent->colorRed();
+					this->_ins_balance(grandparent);
+				} else {
+					this->_rotate(x->parent);
+//					this->_ins_balance(x->parent);
+				}
 			}
 		};
 

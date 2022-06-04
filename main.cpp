@@ -22,7 +22,7 @@ template <class T, class V>
 std::vector<int> clear_test(ft::map<T, V> mp) {
 	std::vector<int> v;
 //	mp.clear();
-	for (int i = 0, j = 0; i < 25 * 6000; ++i, ++j)
+	for (int i = 0, j = 0; i < 6; ++i, ++j)
 		mp.insert(ft::make_pair(i, j));
 	v.push_back(mp.size());
 //	mp.clear();
@@ -30,9 +30,9 @@ std::vector<int> clear_test(ft::map<T, V> mp) {
 	typename ft::map<T, V>::iterator it = mp.begin();
 	if (it == mp.end())
 		v.push_back(1);
-	std::cout << "HEEEERE" << std::endl;
-//	mp.data().print();
-	std::cout << "HEEEERE" << std::endl;
+//	std::cout << "HEEEERE" << std::endl;
+////	mp.data().print();
+//	std::cout << "HEEEERE" << std::endl;
 	return v;
 }
 
@@ -170,24 +170,24 @@ int main()
 //		std::cout << ret.second->first << " => " << ret.second->second << '\n';
 //	}
 //
-	{
-		ft::map<char,int> first;
-
-		first['a']=10;
-		first['b']=30;
-		first['c']=50;
-		first['d']=70;
-
-		ft::map<char,int> second (first.begin(),first.end());
-		std::cout << "second contains:\n";
-		for (ft::map<char,int>::iterator it=second.begin(); it!=second.end(); ++it)
-			std::cout << it->first << " => " << it->second << '\n';
-		ft::map<char,int> third (second);
-		std::cout << "third contains:\n";
-		for (ft::map<char,int>::iterator it=third.begin(); it!=third.end(); ++it)
-			std::cout << it->first << " => " << it->second << '\n';
-		std::cout << "third size: " << third.size() << '\n';
-	}
+//	{
+//		ft::map<char,int> first;
+//
+//		first['a']=10;
+//		first['b']=30;
+//		first['c']=50;
+//		first['d']=70;
+//
+//		ft::map<char,int> second (first.begin(),first.end());
+//		std::cout << "second contains:\n";
+//		for (ft::map<char,int>::iterator it=second.begin(); it!=second.end(); ++it)
+//			std::cout << it->first << " => " << it->second << '\n';
+//		ft::map<char,int> third (second);
+//		std::cout << "third contains:\n";
+//		for (ft::map<char,int>::iterator it=third.begin(); it!=third.end(); ++it)
+//			std::cout << it->first << " => " << it->second << '\n';
+//		std::cout << "third size: " << third.size() << '\n';
+//	}
 //
 //	{
 //		ft::map<char,int> foo,bar;
