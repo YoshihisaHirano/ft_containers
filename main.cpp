@@ -19,20 +19,17 @@ std::vector<int> clear_test(std::map<T, V> mp) {
 }
 
 template <class T, class V>
-std::vector<int> clear_test(ft::map<T, V> mp) {
+std::vector<int> clear_test(ft::map<T, V> &mp) {
 	std::vector<int> v;
-//	mp.clear();
-	for (int i = 0, j = 0; i < 6; ++i, ++j)
+	mp.clear();
+	for (int i = 0, j = 0; i < 25 * 10000; ++i, ++j)
 		mp.insert(ft::make_pair(i, j));
 	v.push_back(mp.size());
-//	mp.clear();
+	mp.clear();
 	v.push_back(mp.size());
 	typename ft::map<T, V>::iterator it = mp.begin();
 	if (it == mp.end())
 		v.push_back(1);
-//	std::cout << "HEEEERE" << std::endl;
-////	mp.data().print();
-//	std::cout << "HEEEERE" << std::endl;
 	return v;
 }
 
@@ -40,8 +37,46 @@ std::vector<int> clear_test(ft::map<T, V> mp) {
 int main()
 {
 	{
-		ft::map<int, int> mm;
-		std::vector<int> mv = clear_test(mm);
+		// ft::map<int, int> mm;
+		// ft::map<int, int> m1;
+		ft::map<std::string, std::string> mm;
+		ft::map<std::string, std::string> m1;
+		// std::vector<int> mv = clear_test(mm);
+		// mm.data().prettyPrint();
+		// m1.insert(ft::make_pair(2, 3)); mm.insert(ft::make_pair(2, 3));
+		// m1.insert(ft::make_pair(3, 3)); mm.insert(ft::make_pair(4, 3));
+		// m1.insert(ft::make_pair(3, 4)); mm.insert(ft::make_pair(3, 4));
+		// m1.insert(ft::make_pair(4, 4)); mm.insert(ft::make_pair(4, 4));
+		// m1.insert(ft::make_pair(4, 5)); mm.insert(ft::make_pair(4, 5));
+		m1.insert(ft::make_pair("123", "124")); mm.insert(ft::make_pair("124", "123"));
+		// m1.insert(ft::make_pair("123", "124")); mm.insert(ft::make_pair("123", "124"));
+		// m1.insert(ft::make_pair("124", "123")); mm.insert(ft::make_pair("124", "123"));
+		// m1.insert(ft::make_pair("12", "123")); mm.insert(ft::make_pair("12", "123"));
+		// m1.insert(ft::make_pair("123", "12")); mm.insert(ft::make_pair("123", "12"));
+		// std::cout << mm.size() << " " << m1.size() << std::endl;
+		std::cout << (m1 < mm) << std::endl;
+	}
+		{
+		// std::map<int, int> mm;
+		// std::map<int, int> m1;
+		std::map<std::string, std::string> mm;
+		std::map<std::string, std::string> m1;
+		// std::vector<int> mv = clear_test(mm);
+		// mm.data().prettyPrint();
+		// m1.insert(std::make_pair(2, 3)); mm.insert(std::make_pair(2, 3));
+		// m1.insert(std::make_pair(3, 3)); mm.insert(std::make_pair(4, 3));
+		// m1.insert(std::make_pair(3, 4)); mm.insert(std::make_pair(3, 4));
+		// m1.insert(std::make_pair(4, 4)); mm.insert(std::make_pair(4, 4));
+		// m1.insert(std::make_pair(4, 5)); mm.insert(std::make_pair(4, 5));
+		m1.insert(std::make_pair("123", "124")); mm.insert(std::make_pair("124", "123"));
+		// m1.insert(std::make_pair("123", "123")); mm.insert(std::make_pair("123", "123"));
+		// m1.insert(std::make_pair("123", "124")); mm.insert(std::make_pair("123", "124"));
+		// m1.insert(std::make_pair("124", "123")); mm.insert(std::make_pair("124", "123"));
+		// m1.insert(std::make_pair("12", "123")); mm.insert(std::make_pair("12", "123"));
+		// m1.insert(std::make_pair("123", "12")); mm.insert(std::make_pair("123", "12"));
+		// std::cout << mm.size() << " " << m1.size() << std::endl;
+		std::cout << (m1 < mm) << std::endl;
+
 	}
 //	{
 //	ft::map<int, char> mymap;

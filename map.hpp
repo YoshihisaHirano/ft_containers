@@ -11,22 +11,6 @@ namespace ft {
 	template < class Key, class T, class Compare = std::less<Key>,
         class Alloc = std::allocator<pair<const Key,T> > >
 	class map {
-		class value_compare : public std::binary_function<pair<const Key, T>, pair<const Key, T>, bool> {
-			friend class map;
-
-			protected:
-			Compare comp;
-			value_compare(Compare c) : comp(c) {};
-
-			public:
-			typedef bool				result_type;
-			typedef pair<const Key, T>	first_argument_type;
-			typedef pair<const Key, T>	second_argument_type;
-			bool operator() (const first_argument_type& x, const second_argument_type& y) const
-			{
-				return comp(x.first, y.first);
-			};
-		};
 
 		public:
 		typedef pair<const Key, T>									value_type;
@@ -38,12 +22,28 @@ namespace ft {
 		typedef	typename allocator_type::const_reference			const_reference;
 		typedef	typename allocator_type::pointer					pointer;
 		typedef typename allocator_type::const_pointer				const_pointer;
+		typedef	unsigned long										size_type;
+		typedef	ptrdiff_t											difference_type;
+
+		class value_compare : public std::binary_function<value_type, value_type, bool>
+		{
+		public:
+			Compare comp;
+
+			value_compare(void) : comp(Compare()) {}
+			value_compare (Compare c) : comp(c) {}
+		
+			bool operator() (const value_type& x, const value_type& y) const
+			{
+				return comp(x.first, y.first);
+			}
+		};
+
+		public:
 		typedef typename bs_tree<value_type, value_compare>::iterator				iterator;
 		typedef typename bs_tree<value_type, value_compare>::const_iterator		const_iterator;
 		typedef reverse_iterator<const_iterator>					const_reverse_iterator;
 		typedef reverse_iterator<iterator>							reverse_iterator;
-		typedef	unsigned long										size_type;
-		typedef	ptrdiff_t											difference_type;
 
 		private:
 		bs_tree<value_type, value_compare>	_data;
@@ -53,7 +53,7 @@ namespace ft {
 
 		public:
 
-		bs_tree<value_type, value_compare>& data() { return this->_data; }
+		bs_tree<value_type, value_compare>& data() { return this->_data; } //delete
 
 		map(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) 
 		: _data(NULL, value_compare(comp)), _size(0), _comp(comp), _alloc(alloc) {};
@@ -70,7 +70,7 @@ namespace ft {
 		};
 
 		~map() {
-//			this->clear();
+			this->clear();
 		};
 
 		map& operator=(const map& x) { 
@@ -103,6 +103,7 @@ namespace ft {
 		value_compare	value_comp() const { return value_compare(key_compare()); };
 		size_type		max_size() const { return this->_data.max_size(); };
 		size_type		size() const { return this->_size; };
+
 
 		mapped_type& at (const key_type& k) {
 			return (*this)[k];
@@ -249,30 +250,22 @@ namespace ft {
 
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator<(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
-		typename map<Key,T,Compare,Alloc>::const_iterator first1 = lhs.begin();
-		typename map<Key,T,Compare,Alloc>::const_iterator first2 = rhs.begin();
-		typename map<Key,T,Compare,Alloc>::const_iterator last1 = lhs.end();
-		typename map<Key,T,Compare,Alloc>::const_iterator last2 = rhs.end();
-		for (; first1 != last1; first1++, first2++) {
-			if (first2 == last2 || (*first2 < *first1)) { return false; }
-			else if (*first1 < *first2) { return true; }
-		}
-		return (*first2 != *last2);
+			return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 	};
 
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator<=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
-		return !(lhs > rhs);
+		return (lhs < rhs || lhs == rhs);
 	};
 
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator>(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
-		return (rhs < lhs);
+		return !(lhs <= rhs);
 	};
 
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator>=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs) {
-		return !(lhs < rhs);
+		return (lhs > rhs || lhs == rhs);
 	};
 }
 
