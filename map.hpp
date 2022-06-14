@@ -40,20 +40,18 @@ namespace ft {
 		};
 
 		public:
-		typedef typename bs_tree<value_type, value_compare>::iterator				iterator;
-		typedef typename bs_tree<value_type, value_compare>::const_iterator		const_iterator;
+		typedef typename bs_tree<value_type, value_compare, Alloc>::iterator				iterator;
+		typedef typename bs_tree<value_type, value_compare, Alloc>::const_iterator		const_iterator;
 		typedef reverse_iterator<const_iterator>					const_reverse_iterator;
 		typedef reverse_iterator<iterator>							reverse_iterator;
 
 		private:
-		bs_tree<value_type, value_compare>	_data;
+		bs_tree<value_type, value_compare, Alloc>	_data;
 		size_type							_size;
 		key_compare							_comp;
 		allocator_type						_alloc;
 
 		public:
-
-		bs_tree<value_type, value_compare>& data() { return this->_data; } //delete
 
 		map(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) 
 		: _data(NULL, value_compare(comp)), _size(0), _comp(comp), _alloc(alloc) {};
@@ -81,11 +79,11 @@ namespace ft {
 		};
 
 		mapped_type& operator[] (const key_type& k) {
-			this->_size++;
 			iterator it_find = this->find(k);
 			if (it_find != this->end()) { return (*it_find).second; }
 			ft::pair<key_type, mapped_type> newPair(k, mapped_type());
 			iterator it_ins = this->_data.insert(newPair);
+			this->_size++;
 			return (*it_ins).second;
 		};
 
@@ -135,11 +133,13 @@ namespace ft {
 		};
 
 		pair<iterator,bool> insert(const value_type& val) {
-			iterator it = this->_data.insert(val);
-			if (it == this->end())
-				return pair<iterator,bool>(it, false);
-			this->_size++;
-			return pair<iterator,bool>(it, true);
+			iterator it = this->find(val.first);
+			if (it == this->end()) {
+				it = this->_data.insert(val);
+				this->_size++;
+				return pair<iterator,bool>(it, true);
+			}
+			return pair<iterator,bool>(it, false);
 		};
 
 		iterator		insert(iterator position, const value_type& val) {

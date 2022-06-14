@@ -33,14 +33,88 @@ std::vector<int> clear_test(ft::map<T, V> &mp) {
 	return v;
 }
 
+template <class T, class V>
+std::vector<int> insert_test(std::map<T, V> mp) {
+    std::vector<int> v;
+    std::pair<std::map<int, int>::iterator , bool> pair = mp.insert(std::make_pair(7, 7));
+    std::map<int, int>::iterator it = mp.begin();
+    v.push_back(it->first);
+    v.push_back(it->second);
+    v.push_back(pair.first->first);
+    v.push_back(pair.first->second);
+    v.push_back(pair.second);
+    mp.insert(std::make_pair(9, 9));
+    std::pair<std::map<int, int>::iterator , bool> pair2 = mp.insert(std::make_pair(9, 9));
+    std::map<int, int>::iterator it2 = pair.first;
+    v.push_back(it2->first);
+    v.push_back(it2->second);
+    v.push_back(pair2.first->first);
+    v.push_back(pair2.first->second);
+    v.push_back(pair2.second);
+    // for (int i = 0, j = 0; i < 10 * 1; ++i, ++j) {
+    //     mp.insert(std::make_pair(i, j));
+    // }
+    // typename std::map<T, V>::iterator it3 = mp.begin();
+    // for (; it3 != mp.end(); ++it3) {
+    //     v.push_back(it3->first);
+    //     v.push_back(it3->second);
+    // }
+    v.push_back(mp.size());
+    return v;
+}
+
+template <class T, class V>
+std::vector<int> insert_test(ft::map<T, V> mp) {
+    std::vector<int> v;
+    ft::pair<ft::map<int, int>::iterator , bool> pair = mp.insert(ft::make_pair(7, 7));
+    ft::map<int, int>::iterator it = mp.begin();
+    v.push_back(it->first);
+    v.push_back(it->second);
+    v.push_back(pair.first->first);
+    v.push_back(pair.first->second);
+    v.push_back(pair.second);
+    mp.insert(ft::make_pair(9, 9));
+    ft::pair<ft::map<int, int>::iterator , bool> pair2 = mp.insert(ft::make_pair(9, 9));
+    ft::map<int, int>::iterator it2 = pair.first;
+    v.push_back(it2->first);
+    v.push_back(it2->second);
+    v.push_back(pair2.first->first);
+    v.push_back(pair2.first->second);
+    v.push_back(pair2.second);
+    // for (int i = 0, j = 0; i < 10 * 1; ++i, ++j) {
+    //     mp.insert(ft::make_pair(i, j));
+    // }
+    // typename ft::map<T, V>::iterator it3 = mp.begin();
+    // for (; it3 != mp.end(); ++it3) {
+    //     v.push_back(it3->first);
+    //     v.push_back(it3->second);
+    // }
+    v.push_back(mp.size());
+    return v;
+}
+
 
 int main()
 {
 	{
+		std::map<int, int> m;
+		ft::map<int, int> mm;
+		std::vector<int> v = insert_test(m);
+		std::vector<int> mv = insert_test(mm);
+		std::cout << "vector: ";
+		for (int i = 0; i < v.size(); i++)
+			std::cout << v[i] << " ";
+		std::cout << std::endl;
+		std::cout << "my vector: ";
+		for (int i = 0; i < mv.size(); i++)
+			std::cout << mv[i] << " ";
+		std::cout << std::endl;
+	}
+	{
 		// ft::map<int, int> mm;
 		// ft::map<int, int> m1;
-		ft::map<std::string, std::string> mm;
-		ft::map<std::string, std::string> m1;
+		// ft::map<std::string, std::string> mm;
+		// ft::map<std::string, std::string> m1;
 		// std::vector<int> mv = clear_test(mm);
 		// mm.data().prettyPrint();
 		// m1.insert(ft::make_pair(2, 3)); mm.insert(ft::make_pair(2, 3));
@@ -48,19 +122,19 @@ int main()
 		// m1.insert(ft::make_pair(3, 4)); mm.insert(ft::make_pair(3, 4));
 		// m1.insert(ft::make_pair(4, 4)); mm.insert(ft::make_pair(4, 4));
 		// m1.insert(ft::make_pair(4, 5)); mm.insert(ft::make_pair(4, 5));
-		m1.insert(ft::make_pair("123", "124")); mm.insert(ft::make_pair("124", "123"));
+		// m1.insert(ft::make_pair("123", "124")); mm.insert(ft::make_pair("124", "123"));
 		// m1.insert(ft::make_pair("123", "124")); mm.insert(ft::make_pair("123", "124"));
 		// m1.insert(ft::make_pair("124", "123")); mm.insert(ft::make_pair("124", "123"));
 		// m1.insert(ft::make_pair("12", "123")); mm.insert(ft::make_pair("12", "123"));
 		// m1.insert(ft::make_pair("123", "12")); mm.insert(ft::make_pair("123", "12"));
 		// std::cout << mm.size() << " " << m1.size() << std::endl;
-		std::cout << (m1 < mm) << std::endl;
+		// std::cout << (m1 < mm) << std::endl;
 	}
 		{
 		// std::map<int, int> mm;
 		// std::map<int, int> m1;
-		std::map<std::string, std::string> mm;
-		std::map<std::string, std::string> m1;
+		// std::map<std::string, std::string> mm;
+		// std::map<std::string, std::string> m1;
 		// std::vector<int> mv = clear_test(mm);
 		// mm.data().prettyPrint();
 		// m1.insert(std::make_pair(2, 3)); mm.insert(std::make_pair(2, 3));
@@ -68,14 +142,14 @@ int main()
 		// m1.insert(std::make_pair(3, 4)); mm.insert(std::make_pair(3, 4));
 		// m1.insert(std::make_pair(4, 4)); mm.insert(std::make_pair(4, 4));
 		// m1.insert(std::make_pair(4, 5)); mm.insert(std::make_pair(4, 5));
-		m1.insert(std::make_pair("123", "124")); mm.insert(std::make_pair("124", "123"));
+		// m1.insert(std::make_pair("123", "124")); mm.insert(std::make_pair("124", "123"));
 		// m1.insert(std::make_pair("123", "123")); mm.insert(std::make_pair("123", "123"));
 		// m1.insert(std::make_pair("123", "124")); mm.insert(std::make_pair("123", "124"));
 		// m1.insert(std::make_pair("124", "123")); mm.insert(std::make_pair("124", "123"));
 		// m1.insert(std::make_pair("12", "123")); mm.insert(std::make_pair("12", "123"));
 		// m1.insert(std::make_pair("123", "12")); mm.insert(std::make_pair("123", "12"));
 		// std::cout << mm.size() << " " << m1.size() << std::endl;
-		std::cout << (m1 < mm) << std::endl;
+		// std::cout << (m1 < mm) << std::endl;
 
 	}
 //	{

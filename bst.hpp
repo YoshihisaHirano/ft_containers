@@ -21,6 +21,36 @@ namespace ft {
 
 		bst_node(T value, node lt = NULL, node rt = NULL, node pt = NULL, bool red = true)
 		: value(value), left(lt), right(rt), parent(pt), red(red) {};
+
+		node	sibling() { 
+			if (this->parent) {
+				if (this == this->parent->left) { return this->parent->right; }
+				else { return this->parent->left; }
+			}
+			return NULL;
+		};
+
+		bool	hasRedChild() { 
+			if (this->right && this->right->red) { return true; }
+			if (this->left && this->left->red) { return true; }
+			return false;
+		}
+
+		node	successor() { 
+			node tmp = this;
+			node parent = this->parent;
+			if (tmp->right) { 
+				tmp = tmp->right;
+				while (tmp->left) 
+					tmp = tmp->left;
+				return tmp;
+			}
+			while (parent && parent->right == tmp) {
+				tmp = parent;
+				parent = parent->parent;
+			}
+			return parent;
+		}
 	};
 
 	template <bool isConst, typename T>
@@ -56,7 +86,9 @@ namespace ft {
 	Node	*getPos() const { return this->position; }
 
 	reference			operator*() { return this->position->value; };
+	const reference		operator*() const { return this->position->value; };
 	pointer				operator->() { return &(this->position->value); };
+	const pointer		operator->() const { return &(this->position->value); };
 
 	bst_iterator		&operator++() {
 		if (this->tree_root == NULL) {
@@ -123,11 +155,12 @@ namespace ft {
 	};
 };
 
-	template <typename T, class Compare = std::less<T> >
+	template <typename T, typename Compare, typename Alloc = std::allocator<T> >
 	class bs_tree {
 		protected:
-		typedef bst_node<T>			node;
-		typedef bs_tree<T, Compare>	tree;
+		typedef bst_node<T>										node;
+		typedef bs_tree<T, Compare>								tree;
+		typedef typename Alloc::template rebind<node>::other	allocator;
 
 		public:
 		typedef bst_iterator<false, T>	iterator;
@@ -136,9 +169,26 @@ namespace ft {
 		private:
 		node			*root;
 		Compare			comp;
+		allocator		alloc;
+
+		void	_delete(node *x) { 
+			alloc.deallocate(x, sizeof(node));
+		}
+
+		node	*_makeNode(node x) {
+			node	*newNode = alloc.allocate(sizeof(x));
+			alloc.construct(newNode, x);
+			return newNode;
+		}
+
+		node	*_makeNode(node x) const {
+			node	*newNode = alloc.allocate(sizeof(x));
+			alloc.construct(newNode, x);
+			return newNode;
+		}
 
 		node	*_insert(const T &val) {
-			node *newNode = new node(val, NULL, NULL, NULL);
+			node *newNode = this->_makeNode(node(val, NULL, NULL, NULL));
 			node *x = this->root;
 			node *y = NULL;
 			while (x != NULL) {
@@ -164,33 +214,8 @@ namespace ft {
 			node *newNode = this->_insert(val);
 			if (newNode->parent == NULL || newNode->parent->parent == NULL)
 				return newNode;
-			this->_preserve_balance(newNode);
+			this->_preserveBalance(newNode);
 			return newNode;
-		};
-
-		bool	_remove(const T &val, node * &subtreeRoot) {
-			if (subtreeRoot == NULL)
-				return false;
-			if (comp(val, subtreeRoot->value))
-				return this->_remove(val, subtreeRoot->left);
-			if (comp(subtreeRoot->value, val))
-				return this->_remove(val, subtreeRoot->right);
-			if (subtreeRoot->left != NULL && subtreeRoot->right != NULL) {
-				node *min = this->findMin(subtreeRoot->right);
-				node *newParent = new node(min->value, subtreeRoot->left, subtreeRoot->right, subtreeRoot->parent);
-				delete subtreeRoot;
-				subtreeRoot = newParent;
-				this->_remove(subtreeRoot->value, subtreeRoot->right);
-				return true;
-			}
-			else {
-				node *toBeDeleted = subtreeRoot;
-				subtreeRoot = (subtreeRoot->left != NULL) ? subtreeRoot->left : subtreeRoot->right;
-				if (subtreeRoot != NULL)
-					subtreeRoot->parent = toBeDeleted->parent;
-				delete toBeDeleted;
-				return true;
-			}
 		};
 
 		node	*_clone(node *subtreeRoot) const {
@@ -228,7 +253,128 @@ namespace ft {
 
 	private:
 
-		void	_preserve_balance(node *x) {
+		void	_fixDoubleBlack(node *x) { 
+			if (x == this->root) return;
+			node *sibling = x->sibling();
+			node *parent = x->parent;
+
+			if (sibling == NULL)
+				this->_fixDoubleBlack(parent);
+			else { 
+				if (sibling->red) {
+					parent->red = true;
+					sibling->red = false;
+					if (sibling == parent->left)
+						this->_rightRotate(parent);
+					else
+						this->_leftRotate(parent);
+					this->_fixDoubleBlack(x);
+				} else {
+					if (sibling->hasRedChild()) {
+						if (sibling->left && sibling->left->red) { 
+							if (parent->left == sibling) {
+								sibling->left->red = sibling->red;
+								sibling->red = parent->red;
+								this->_rightRotate(parent);
+							} else {
+								sibling->left->red = parent->red;
+								this->_rightRotate(sibling);
+								this->_leftRotate(parent);
+							}
+						} else {
+							if (parent->left == sibling) {
+								sibling->right->red = parent->red;
+								this->_leftRotate(sibling);
+								this->_rightRotate(parent);
+							} else {
+								sibling->right->red = sibling->red;
+								sibling->red = parent->red;
+								this->_leftRotate(parent);
+							}
+						}
+					} else {
+						sibling->red = true;
+						if (!parent->red)
+							this->_fixDoubleBlack(parent);
+						else
+							parent->red = false;
+					}
+				}
+			}
+		}
+
+		node	*_nodeForReplacement(node *x) {
+			if (x->left && x->right)
+				return x->successor();
+			if (x->left == NULL && x->right == NULL)
+				return x->left;
+			if (x->left)
+				return x->left;
+			else
+				return x->right;
+		}
+
+		void	_swapValues(node *u, node *v) {
+			node *successor_copy = this->_makeNode(node(u->value, v->left, v->right, v->parent, u->red));
+			if (v->parent && v->parent->left == v)
+				v->parent->left = successor_copy;
+			else if (v->parent && v->parent->right == v)
+				v->parent->right = successor_copy;
+			if (v->left)
+				v->left->parent = successor_copy;
+			if (v->right)
+				v->right->parent = successor_copy;
+			if (v == this->root)
+				this->root = successor_copy;
+			this->_delete(v);
+		}
+
+		void	_deleteNode(node *v) {
+			node *u = this->_nodeForReplacement(v);
+			bool bothBlack = (u == NULL || !u->red) && !v->red;
+			node *parent = v->parent;
+			node *sibling = v->sibling();
+			if (u == NULL) {
+				if (v == root) { root = NULL; }
+				else { 
+					if (bothBlack)
+						this->_fixDoubleBlack(v);
+					else {
+						if (sibling)
+							sibling->red = true;
+					}
+					if (parent->left == v)
+						parent->left = NULL;
+					else
+						parent->right = NULL;
+				}
+				this->_delete(v);
+				return;
+			}
+			if (v->left == NULL || v->right == NULL) {
+				if (v == this->root) { 
+					this->root = u;
+					u->left = u->right = u->parent = NULL;
+					this->_delete(v);
+				} else {
+					if (parent->left == v)
+						parent->left = u;
+					else
+						parent->right = u;
+					this->_delete(v);
+					u->parent = parent;
+					if (bothBlack)
+						this->_fixDoubleBlack(u);
+					else
+						u->red = false;
+				}
+				return;
+			}
+			this->_swapValues(u, v);
+			this->_deleteNode(u);
+		};
+
+		void	_preserveBalance(node *x) {
 			node *uncle;
 			while(x->parent && x->parent->red) {
 				if (x->parent == x->parent->parent->right) {
@@ -275,7 +421,7 @@ namespace ft {
 				return;
 			this->_clear(subtreeRoot->left);
 			this->_clear(subtreeRoot->right);
-			delete subtreeRoot;
+			this->_delete(subtreeRoot);
 			subtreeRoot = NULL;
 		};
 
@@ -314,12 +460,13 @@ namespace ft {
 		};
 
 		public:
-		bs_tree(const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {};
-		bs_tree(node *root, const Compare& compare = std::less<T>()) : root(root), comp(compare) {};
+		bs_tree(const Compare& compare = std::less<T>(), const Alloc& a = allocator()) : root(NULL), comp(compare), alloc(a) {};
+		bs_tree(node *root, const Compare& compare = std::less<T>(), const Alloc& a = allocator()) : root(root), comp(compare), alloc(a) {};
 		bs_tree(const tree &other, const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {
-			this->root = this->_clone(other.root); //TOOD check what's wrong with clone, why adding two values
+			this->root = this->_clone(other.root);
+			this->alloc = other.alloc;
 		};
-		virtual ~bs_tree() {
+		~bs_tree() {
 			this->clear();
 		};
 
@@ -371,7 +518,10 @@ namespace ft {
 		};
 
 		bool		remove(const T &val) {
-			return this->_remove(val, this->root);
+			iterator it = this->find(val);
+			if (it == this->end()) { return false; }
+			this->_deleteNode(it.getPos());
+			return true;
 		}
 
 		iterator	begin() const { 
