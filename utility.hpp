@@ -154,4 +154,26 @@ namespace ft {
 	struct conditional<false, T, U> { typedef U type; };
 }
 
+// for tests
+
+struct s_time_res
+{
+	time_t std_start;
+	time_t std_end;
+	time_t ft_start;
+	time_t ft_end;
+}  ;
+// struct s_time_res	t_res;
+
+time_t timer();
+void print_res(std::string test, std::vector<int> &s,
+			   std::vector<int> &u, struct s_time_res &res);
+void print_header();
+
+void vector_test(void);
+void stack_test(void);
+void pair_test(void);
+void map_test(void);
+void set_test(void);
+
 #endif // __UTILITY_H__

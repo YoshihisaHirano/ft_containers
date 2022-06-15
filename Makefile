@@ -1,4 +1,5 @@
-SRC		=	main.cpp
+SRC		=	main.cpp tests/utils_test.cpp tests/vector_tests.cpp\
+            tests/stack_tests.cpp tests/pair_test.cpp tests/map_tests.cpp tests/set_tests.cpp
 HDRS	=	vector.hpp stack.hpp bst.hpp map.hpp set.hpp
 NAME	=	ft_containers
 
@@ -11,3 +12,5 @@ $(NAME)	:	$(SRC) $(HDRS)
 
 fclean	:	
 			rm -f $(NAME)
+
+re		:	fclean all
