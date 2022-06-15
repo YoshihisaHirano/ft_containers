@@ -153,15 +153,22 @@ namespace ft {
 				this->insert(*first);
 		};
 
-		iterator		lower_bound (const key_type& k) { 
-			iterator it = this->find(k);
-			if (it != this->end())
-				return it;
-			for (it = this->begin(); it != this->end(); ++it) {
-				if (!this->_comp(it->first, k))
-					break;
+		iterator		lower_bound (const key_type& k) {
+			bst_node<value_type>	*tmp = this->_data.getRoot();
+			bst_node<value_type>	*tmp2 = NULL;
+
+			while(tmp) {
+				tmp2 = tmp;
+				if (tmp->value.first == k)
+					return iterator(tmp, this->_data.getRoot());
+				if (this->_comp(k, tmp->value.first))
+					tmp = tmp->left;
+				else
+					tmp = tmp->right;
 			}
-			return it;
+			if (this->_comp(tmp2->value.first, k))
+				return iterator(tmp2->successor(), this->_data.getRoot());
+			return iterator(tmp2, this->_data.getRoot());
 		};
 
 		const_iterator	lower_bound (const key_type& k) const { 
@@ -169,12 +176,21 @@ namespace ft {
 		};
 
 		iterator		upper_bound (const key_type& k) {
-			iterator it = this->begin();
-			for (; it != this->end(); ++it) {
-				if (this->_comp(k, it->first))
-					break;
+			bst_node<value_type>	*tmp = this->_data.getRoot();
+			bst_node<value_type>	*tmp2 = NULL;
+
+			while(tmp) {
+				tmp2 = tmp;
+				if (tmp->value.first == k)
+					return iterator(tmp->successor(), this->_data.getRoot());
+				if (this->_comp(k, tmp->value.first))
+					tmp = tmp->left;
+				else
+					tmp = tmp->right;
 			}
-			return it;
+			if (this->_comp(tmp2->value.first, k))
+				return iterator(tmp2->successor(), this->_data.root);
+			return iterator(tmp2, this->_data.getRoot());
 		};
 
 		const_iterator	upper_bound (const key_type& k) const { 

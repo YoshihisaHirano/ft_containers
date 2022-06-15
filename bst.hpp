@@ -22,6 +22,11 @@ namespace ft {
 		bst_node(T value, node lt = NULL, node rt = NULL, node pt = NULL, bool red = true)
 		: value(value), left(lt), right(rt), parent(pt), red(red) {};
 
+		bst_node(bst_node const *other) : value(other->value), left(other->left), right(other->right),
+		parent(other->right), red(other->red)
+		{
+		}
+
 		node	sibling() { 
 			if (this->parent) {
 				if (this == this->parent->left) { return this->parent->right; }
@@ -63,6 +68,7 @@ namespace ft {
 	Node		*tree_root;
 
 	public:
+	typedef Node*													iterator_type;
 	typedef typename ft::conditional<isConst, const T&, T&>::type	reference;
 	typedef typename ft::conditional<isConst, const T*, T*>::type   pointer;
 
@@ -165,23 +171,19 @@ namespace ft {
 		public:
 		typedef bst_iterator<false, T>	iterator;
 		typedef bst_iterator<true, T>	const_iterator;
+		node							*root;
 
 		private:
-		node			*root;
 		Compare			comp;
 		allocator		alloc;
 
-		void	_delete(node *x) { 
-			alloc.deallocate(x, sizeof(node));
+		void	_delete(node *x) {
+			alloc.destroy(x);
+			alloc.deallocate(x, sizeof(x));
+			x = NULL;
 		}
 
 		node	*_makeNode(node x) {
-			node	*newNode = alloc.allocate(sizeof(x));
-			alloc.construct(newNode, x);
-			return newNode;
-		}
-
-		node	*_makeNode(node x) const {
 			node	*newNode = alloc.allocate(sizeof(x));
 			alloc.construct(newNode, x);
 			return newNode;
@@ -210,7 +212,7 @@ namespace ft {
 			return newNode;
 		};
 
-		node	*_insert_rb(const T &val, node * &subtreeRoot, node *parent) {
+		node	*_insert_rb(const T &val) {
 			node *newNode = this->_insert(val);
 			if (newNode->parent == NULL || newNode->parent->parent == NULL)
 				return newNode;
@@ -218,40 +220,16 @@ namespace ft {
 			return newNode;
 		};
 
-		node	*_clone(node *subtreeRoot) const {
-			if (subtreeRoot == NULL)
-				return NULL;
-			else
-				return new node(subtreeRoot->value, this->_clone(subtreeRoot->left),
-				this->_clone(subtreeRoot->right), subtreeRoot->parent);
+		node	*_clone(node const *root, node *parent) const {
+			if (root == NULL)
+				return (NULL);
+			node *new_el = new node(root);
+
+			new_el->parent = parent;
+			new_el->left = this->_clone(root->left, new_el);
+			new_el->right = this->_clone(root->right, new_el);
+			return new_el;
 		};
-
-	public: //to delete
-
-		void	print_tree(node *subRoot, std::string indent, bool last) {
-			if (subRoot != NULL) {
-				std::cout << indent;
-				if (last) {
-					std::cout<<"R----";
-					indent += "     ";
-				} else {
-					std::cout<<"L----";
-					indent += "|    ";
-				}
-				std::string sColor = subRoot->red ? "RED" : "BLACK";
-				std::cout<< subRoot->value.first << "(" <<sColor<< ")" << std::endl;
-				print_tree(subRoot->left, indent, false);
-				print_tree(subRoot->right, indent, true);
-			}
-		};
-
-		void prettyPrint() {
-			if (this->root) {
-				print_tree(this->root, "", true);
-			}
-		};
-
-	private:
 
 		void	_fixDoubleBlack(node *x) { 
 			if (x == this->root) return;
@@ -422,7 +400,6 @@ namespace ft {
 			this->_clear(subtreeRoot->left);
 			this->_clear(subtreeRoot->right);
 			this->_delete(subtreeRoot);
-			subtreeRoot = NULL;
 		};
 
 		void	_leftRotate(node *x) {
@@ -463,16 +440,16 @@ namespace ft {
 		bs_tree(const Compare& compare = std::less<T>(), const Alloc& a = allocator()) : root(NULL), comp(compare), alloc(a) {};
 		bs_tree(node *root, const Compare& compare = std::less<T>(), const Alloc& a = allocator()) : root(root), comp(compare), alloc(a) {};
 		bs_tree(const tree &other, const Compare& compare = std::less<T>()) : root(NULL), comp(compare) {
-			this->root = this->_clone(other.root);
+			this->root = this->_clone(other.root, this->root);
 			this->alloc = other.alloc;
 		};
 		~bs_tree() {
 			this->clear();
 		};
 
-		bs_tree	&operator=(const tree &other) {
+		bs_tree	&operator=(const bs_tree &other) {
 			this->clear();
-			this->root = this->_clone(other.root);
+			this->root = this->_clone(other.root, this->root);
 			this->comp = other.comp;
 			return *this;
 		};
@@ -512,7 +489,7 @@ namespace ft {
 		};
 
 		iterator	insert(const T &val) { 
-			node *res = this->_insert_rb(val, this->root, NULL);
+			node *res = this->_insert_rb(val);
 			if (!res) { return this->end(); }
 			return iterator(res, this->root);
 		};

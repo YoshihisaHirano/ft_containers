@@ -2,6 +2,9 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include "vector.hpp"
+#include <string>
+#include "set.hpp"
 
 template <class T, class V>
 std::vector<int> clear_test(std::map<T, V> mp) {
@@ -93,23 +96,98 @@ std::vector<int> insert_test(ft::map<T, V> mp) {
     return v;
 }
 
+bool operator_less_equal_test() {
+	std::vector<int> result, result_2;
+	std::vector<int> v_int1, v_int2, v_int3;
+	std::vector<std::string> v_str1, v_str2;
+	ft::vector<int> V_int1, V_int2, V_int3;
+	ft::vector<std::string> V_str1, V_str2;
+	v_int1.push_back(1);
+	v_int3.push_back(1);
+	v_str1.push_back("aa");
+	v_str2.push_back("ab");
+	result.push_back(v_int1 <= v_int2);
+	v_int2.push_back(2);
+	result.push_back(v_int1 <= v_int2);
+	result.push_back(v_int1 <= v_int3);
+	result.push_back(v_str1 <= v_str2);
+	V_int1.push_back(1);
+	V_int3.push_back(1);
+	V_str1.push_back("aa");
+	V_str2.push_back("ab");
+	result_2.push_back(V_int1 <= V_int2);
+	V_int2.push_back(2);
+	result_2.push_back(V_int1 <= V_int2);
+	result_2.push_back(V_int1 <= V_int3);
+	result_2.push_back(V_str1 <= V_str2);
+	return result == result_2;
+}
+
+//template <class T>
+//std::vector<int> assign_overload_test(ft::set<T> st) {
+//	std::vector<int> v;
+//	for (int i = 0; i < 5; ++i)
+//		st.insert(i);
+//	ft::set<T> st2;
+//	for (int i = 5; i < 10; ++i)
+//		st2.insert(i);
+//
+//	st2 = st;
+//	typename ft::set<T>::iterator it = st2.begin();
+//	for (; it != st2.end(); it++)
+//		v.push_back(*it);
+//	v.push_back(st2.size());
+//	return v;
+//}
+
+template <class T, class V>
+std::vector<int> assign_overload_test(ft::map<T, V> mp) {
+	std::vector<int> v;
+	for (int i = 0, j = 10; i < 20 * 10000; ++i, ++j)
+		mp.insert(ft::make_pair(i, j));
+	ft::map<T, V> mp2;
+	for (int i = 20 * 10000, j = 200010; i < 40 * 10000; ++i, ++j)
+		mp2.insert(ft::make_pair(i, j));
+	mp2 = mp;
+	typename ft::map<T, V>::iterator it = mp2.begin();
+	for (; it != mp2.end(); it++) {
+		v.push_back(it->first);
+		v.push_back(it->second);
+	}
+	v.push_back(mp2.size());
+	return v;
+}
+
 
 int main()
 {
 	{
-		std::map<int, int> m;
-		ft::map<int, int> mm;
-		std::vector<int> v = insert_test(m);
-		std::vector<int> mv = insert_test(mm);
-		std::cout << "vector: ";
-		for (int i = 0; i < v.size(); i++)
-			std::cout << v[i] << " ";
-		std::cout << std::endl;
-		std::cout << "my vector: ";
-		for (int i = 0; i < mv.size(); i++)
-			std::cout << mv[i] << " ";
-		std::cout << std::endl;
+		ft::map<int, int> m;
+		std::vector<int> v = assign_overload_test(m);
 	}
+//	{
+//		ft::set<int> st;
+//		st.insert(90);
+//		std::vector<int> v = assign_overload_test(st);
+//	}
+//	{
+////		std::cout << std::boolalpha;
+//		std::cout << operator_less_equal_test() << std::endl;
+//	}
+//	{
+//		std::map<int, int> m;
+//		ft::map<int, int> mm;
+//		std::vector<int> v = insert_test(m);
+//		std::vector<int> mv = insert_test(mm);
+//		std::cout << "vector: ";
+//		for (int i = 0; i < v.size(); i++)
+//			std::cout << v[i] << " ";
+//		std::cout << std::endl;
+//		std::cout << "my vector: ";
+//		for (int i = 0; i < mv.size(); i++)
+//			std::cout << mv[i] << " ";
+//		std::cout << std::endl;
+//	}
 	{
 		// ft::map<int, int> mm;
 		// ft::map<int, int> m1;

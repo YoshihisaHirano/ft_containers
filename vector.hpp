@@ -4,9 +4,7 @@
 #include <exception>
 #include <iterator>
 #include <iostream>
-#include "iterator.hpp"
-#include "enable_if.hpp"
-#include "is_integral.hpp"
+#include "utility.hpp"
 
 namespace ft {
 	template <typename T>
@@ -16,6 +14,7 @@ namespace ft {
 		T* ptr;
 
 		public:
+		typedef T*												iterator_type;
 		typedef typename iterator_traits<T*>::pointer			pointer;
 		typedef typename iterator_traits<T*>::reference			reference;
 		typedef typename iterator_traits<T*>::difference_type	difference_type;
@@ -174,11 +173,6 @@ namespace ft {
 			pointer tempAllloc = this->_alloc.allocate(newCapacity);
 			if (this->_size > 0)
 				std::copy(this->begin(), this->end(), iterator(tempAllloc));
-//			else {
-//				for (size_type i = 0; i < newCapacity; i++) {
-//					*(tempAllloc + i) = value_type();
-//				}
-//			}
 			this->_removeData(this->begin(), this->end());
 			if (this->_data) {
 				this->_alloc.deallocate(this->_data, this->_capacity);
@@ -506,7 +500,7 @@ namespace ft {
 
 	template <class T, class Alloc>
 	bool operator<=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
-		return !(rhs < lhs);
+		return (lhs < rhs || lhs == rhs);
 	};
 
 	template <class T, class Alloc>
@@ -516,7 +510,7 @@ namespace ft {
 
 	template <class T, class Alloc>
 	bool operator>=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
-		return !(lhs < rhs);
+		return (rhs < lhs || lhs == rhs);
 	};
 
 }

@@ -19,22 +19,22 @@ namespace ft {
 		typedef	typename allocator_type::const_reference		const_reference;
 		typedef	typename allocator_type::pointer				pointer;
 		typedef typename allocator_type::const_pointer			const_pointer;
-		typedef typename bs_tree<T, Compare>::iterator			iterator;
-		typedef typename bs_tree<T, Compare>::iterator			const_iterator;
+		typedef typename bs_tree<value_type, Compare, Alloc>::iterator	iterator;
+		typedef typename bs_tree<value_type, Compare, Alloc>::iterator	const_iterator;
 		typedef reverse_iterator<iterator>						const_reverse_iterator;
 		typedef reverse_iterator<iterator>						reverse_iterator;
 		typedef	unsigned long									size_type;
 		typedef	ptrdiff_t										difference_type;
 
 		private:
-		bs_tree<T, Compare>	_data;
+		bs_tree<value_type, Compare, Alloc>	_data;
 		size_type			_size;
 		key_compare			_comp;
 		allocator_type		_alloc;
 
 		public:
 		set(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) 
-		: _data(NULL, comp), _size(0), _comp(comp), _alloc(alloc) {};
+		: _data(NULL, value_compare(comp)), _size(0), _comp(comp), _alloc(alloc) {};
 
 		template <class InputIterator>
 		set(InputIterator first, InputIterator last, const key_compare& comp = key_compare(),
@@ -50,7 +50,7 @@ namespace ft {
 			this->clear();
 		};
 
-		set& operator=(const set& x) { 
+		set& operator=(const set& x) {
 			this->_data = x._data;
 			this->_size = x._size;
 			this->_comp = x._comp;
@@ -78,23 +78,39 @@ namespace ft {
 		};
 
 		iterator		lower_bound (const value_type& val) const {
-			iterator it = this->find(val);
-			if (it != this->end())
-				return it;
-			for (it = this->begin(); it != this->end(); ++it) {
-				if (!this->_comp(*it, val))
-					break;
+			bst_node<value_type>	*tmp = this->_data.root;
+			bst_node<value_type>	*tmp2 = NULL;
+
+			while(tmp) {
+				tmp2 = tmp;
+				if (tmp->value == val)
+					return iterator(tmp, this->_data.root);
+				if (this->_comp(val, tmp->value))
+					tmp = tmp->left;
+				else
+					tmp = tmp->right;
 			}
-			return it;
+			if (this->_comp(tmp2->value, val))
+				return iterator(tmp2->successor(), this->_data.root);
+			return iterator(tmp2, this->_data.root);
 		};
 
 		iterator		upper_bound (const value_type& val) const {
-			iterator it = this->begin();
-			for (; it != this->end(); ++it) {
-				if (this->_comp(val, *it))
-					break;
+			bst_node<value_type>	*tmp = this->_data.root;
+			bst_node<value_type>	*tmp2 = NULL;
+
+			while(tmp) {
+				tmp2 = tmp;
+				if (tmp->value == val)
+					return iterator(tmp->successor(), this->_data.root);
+				if (this->_comp(val, tmp->value))
+					tmp = tmp->left;
+				else
+					tmp = tmp->right;
 			}
-			return it;
+			if (this->_comp(tmp2->value, val))
+				return iterator(tmp2->successor(), this->_data.root);
+			return iterator(tmp2, this->_data.root);
 		};
 
 		void			erase (iterator position) {
@@ -113,7 +129,7 @@ namespace ft {
 
 		void			erase (iterator first, iterator last) {
 			while (first != last)
-				this->erase((*(first++)).first);
+				this->erase((*(first++)));
 		};
 
 		iterator		find(const value_type& val) const {
@@ -126,11 +142,13 @@ namespace ft {
 		};
 
 		pair<iterator,bool> insert(const value_type& val) {
-			iterator it = this->_data.insert(val);
-			if (it == this->end())
-				return pair<iterator,bool>(it, false);
-			this->_size++;
-			return pair<iterator,bool>(it, true);
+			iterator it = this->find(val);
+			if (it == this->end()) {
+				it = this->_data.insert(val);
+				this->_size++;
+				return pair<iterator,bool>(it, true);
+			}
+			return pair<iterator,bool>(it, false);
 		};
 
 		iterator		insert(iterator position, const value_type& val) {
@@ -188,15 +206,7 @@ namespace ft {
 
 	template <class T, class Compare, class Alloc>
 	bool operator<(const set<T,Compare,Alloc>& lhs, const set<T,Compare,Alloc>& rhs) {
-		typename set<T,Compare,Alloc>::const_iterator first1 = lhs.begin();
-		typename set<T,Compare,Alloc>::const_iterator first2 = rhs.begin();
-		typename set<T,Compare,Alloc>::const_iterator last1 = lhs.end();
-		typename set<T,Compare,Alloc>::const_iterator last2 = rhs.end();
-		for (; first1 != last1; first1++, first2++) {
-			if (first2 == last2 || (*first2 < *first1)) { return false; }
-			else if (*first1 < *first2) { return true; }
-		}
-		return (*first2 != *last2);
+		return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 	};
 
 	template <class T, class Compare, class Alloc>
