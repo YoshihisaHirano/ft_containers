@@ -91,6 +91,8 @@ namespace ft {
 				else
 					tmp = tmp->right;
 			}
+			if (!tmp2)
+				return this->end();
 			if (this->_comp(tmp2->value, val))
 				return iterator(tmp2->successor(), this->_data.root);
 			return iterator(tmp2, this->_data.root);
@@ -109,6 +111,8 @@ namespace ft {
 				else
 					tmp = tmp->right;
 			}
+			if (!tmp2)
+				return this->end();
 			if (this->_comp(tmp2->value, val))
 				return iterator(tmp2->successor(), this->_data.root);
 			return iterator(tmp2, this->_data.root);

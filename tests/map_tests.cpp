@@ -470,12 +470,12 @@ static void erase_test_u(std::vector<int> &V, struct s_time_res &res)
 	for (int i = 1; i < 10; i++)
 		m.insert(ft::make_pair(i, i * 100));
 
-	m.erase( (m.begin()) ); // ok
+	m.erase( (m.begin()) );
 	V.push_back(m.size());
 	_map::iterator it = m.begin();
 	it++;
 	it++;
-	m.erase( it ); // ?
+	m.erase( it );
 	V.push_back(m.size());
 	it = m.begin();
 	for (; it != m.end(); it++)
@@ -490,7 +490,7 @@ static void erase_test_u(std::vector<int> &V, struct s_time_res &res)
 	it++;
 	it++;
 	m.erase(m.begin(), it);
-
+	it = m.begin();
 	for (; it != m.end(); it++)
 		V.push_back(it->first);
 	V.push_back(m.size());

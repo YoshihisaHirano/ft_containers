@@ -5,12 +5,12 @@
 #include <vector>
 #include <iomanip>
 #include <iterator>
-#include "Stack.hpp"
-#include "Vector.hpp"
+#include "stack.hpp"
+#include "vector.hpp"
 #include "utility.hpp"
 #include "bst.hpp"
-#include "Map.hpp"
-#include "Set.hpp"
+#include "map.hpp"
+#include "set.hpp"
 #include <set>
 
 int main(void)

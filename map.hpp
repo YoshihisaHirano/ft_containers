@@ -166,6 +166,8 @@ namespace ft {
 				else
 					tmp = tmp->right;
 			}
+			if (!tmp2)
+				return this->end();
 			if (this->_comp(tmp2->value.first, k))
 				return iterator(tmp2->successor(), this->_data.getRoot());
 			return iterator(tmp2, this->_data.getRoot());
@@ -188,6 +190,8 @@ namespace ft {
 				else
 					tmp = tmp->right;
 			}
+			if (!tmp2)
+				return this->end();
 			if (this->_comp(tmp2->value.first, k))
 				return iterator(tmp2->successor(), this->_data.root);
 			return iterator(tmp2, this->_data.getRoot());

@@ -449,6 +449,7 @@ static void erase_test_u(std::vector<int> &V, struct s_time_res &res)
 	it++;
 	it++;
 	m.erase(m.begin(), it);
+	it = m.begin();
 	for (; it != m.end(); it++)
 		V.push_back(*it);
 	V.push_back(m.size());
